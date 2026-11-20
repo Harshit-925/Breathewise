@@ -1,20 +1,77 @@
-name: CI
+name: CI/CD Pipeline
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
 
 jobs:
-  test:
+  verify:
+    name: Lint, Test & Build
     runs-on: ubuntu-latest
+    env:
+      USE_MOCKS: 'true'
+      ALLOWED_ORIGINS: 'http://localhost:5173,http://localhost:3000'
+      PORT: 3001
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm run test
-      - run: npm run build
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Linter (Oxlint)
+        run: npm run lint
+
+      - name: TypeScript Strict Typecheck
+        run: npm run typecheck
+
+      - name: Run Automated Test Suites (131 Tests)
+        run: npm test
+
+      - name: Build Server Gateway
+        run: npm run build:server
+
+      - name: Build Production Client
+        env:
+          GITHUB_PAGES: 'true'
+        run: npm run build
+
+      - name: Verify Metadata Generation
+        run: npx tsx scripts/generate-metadata.ts
+
+      - name: Upload GitHub Pages Artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: verify
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
