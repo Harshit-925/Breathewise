@@ -1,0 +1,12 @@
+{
+  "app": { "title": "Breathewise", "tagline": "Your AI air quality assistant" },
+  "tabs": {
+    "today": "Today's Air",
+    "routine": "My Routine",
+    "indoor": "Indoor Air",
+    "alternatives": "Commute",
+    "impact": "Impact",
+    "community": "Community",
+    "chat": "Ask AI"
+  }
+}
