@@ -89,6 +89,39 @@ export const StagnationSignalsSchema = z.object({
   deltaTemp: z.number().optional(),
 }).strict();
 
+export const StructuredAdviceSchema = z.object({
+  verdict: z.object({
+    level: z.enum(['good', 'moderate', 'unhealthy', 'hazardous']),
+    headline: z.string().min(1).max(300),
+    why: z.string().min(1).max(1000),
+  }),
+  routine: z.array(z.object({
+    window: z.string().min(1).max(100),
+    activity: z.string().min(1).max(500),
+    reason: z.string().min(1).max(500),
+    impact: z.string().min(1).max(500),
+  })).min(1).max(10),
+  indoor: z.array(z.object({
+    tier: z.enum(['diy', 'standard', 'premium']),
+    title: z.string().min(1).max(200),
+    steps: z.array(z.string().min(1).max(500)).min(1).max(10),
+    costBand: z.string().min(1).max(100),
+    effect: z.string().min(1).max(300),
+    assumptions: z.array(z.string().min(1).max(300)).max(10),
+  })).min(1).max(5),
+  alternatives: z.array(z.object({
+    from: z.string().min(1).max(200),
+    to: z.string().min(1).max(200),
+    effort: z.string().min(1).max(100),
+    exposureDelta: z.number(),
+    co2eDelta: z.number(),
+    assumptions: z.array(z.string().min(1).max(300)).max(10),
+  })).min(1).max(10),
+  disclaimer: z.string().min(1).max(500),
+});
+
+export type StructuredAdviceOutput = z.infer<typeof StructuredAdviceSchema>;
+
 export type GeocodeQuery = z.infer<typeof GeocodeQuerySchema>;
 export type AirQuery = z.infer<typeof AirQuerySchema>;
 export type AdviceRequest = z.infer<typeof AdviceRequestSchema>;

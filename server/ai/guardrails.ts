@@ -1,19 +1,18 @@
-const EMERGENCY_KEYWORDS = [
-  'chest pain',
-  'cannot breathe',
-  'can not breathe',
-  "can't breathe",
-  'difficulty breathing',
-  'shortness of breath',
-  'gasping',
-  'blue lips',
-  'coughing blood',
-  'unconscious',
-  'passed out',
-  'severe asthma attack',
-  'choking',
-  'सांस नहीं आ रही',
-  'सीने में दर्द',
+const ACUTE_MEDICAL_PATTERNS = [
+  /\bchest pain\b/i,
+  /\b(cannot|can not|can't) breathe\b/i,
+  /\bdifficulty breathing\b/i,
+  /\bshortness of breath\b/i,
+  /\bgasping for (air|breath)\b/i,
+  /\bblue lips\b/i,
+  /\bcoughing (up )?blood\b/i,
+  /\bunconscious\b/i,
+  /\bpassed out\b/i,
+  /\bsevere asthma attack\b/i,
+  /\b(i am|i'm|he is|she is|child is|baby is|someone is) choking\b/i,
+  /\bchoking on\b/i,
+  /सांस नहीं आ रही/,
+  /सीने में दर्द/,
 ];
 
 const OFF_TOPIC_KEYWORDS = [
@@ -50,8 +49,7 @@ export function wrapUserInput(input: string): string {
 }
 
 export function checkEmergencySymptoms(input: string): boolean {
-  const lower = input.toLowerCase();
-  return EMERGENCY_KEYWORDS.some((kw) => lower.includes(kw));
+  return ACUTE_MEDICAL_PATTERNS.some((pattern) => pattern.test(input));
 }
 
 export function checkOffTopic(input: string): boolean {

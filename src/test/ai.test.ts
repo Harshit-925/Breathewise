@@ -8,7 +8,9 @@ import {
 } from '../../server/ai/guardrails.js';
 import { generateCacheKey, getCachedResponse, setCachedResponse } from '../../server/ai/cache.js';
 import { generateFallbackAdvice } from '../../server/ai/fallback.js';
-import { cadrRequired } from '../../src/lib/engine/cadr.js';
+import { generateAdviceWithGemini, overwriteWithDeterministicEngine } from '../../server/ai/gemini.js';
+import { StructuredAdviceSchema } from '../../server/schemas/index.js';
+import { cadrRequired, purificationTime } from '../../src/lib/engine/cadr.js';
 import type { HouseholdProfile, AirData } from '../../src/types/index.js';
 
 describe('ai layer suite', () => {
@@ -113,5 +115,72 @@ describe('ai layer suite', () => {
 
   it('EMERGENCY_REDIRECT_MESSAGE directs user to emergency services', () => {
     expect(EMERGENCY_REDIRECT_MESSAGE).toContain('112 / 911 / 999');
+  });
+
+  // ─── Tests for Bug Fixes & Deterministic Engine Overwrite ───
+  it('overwriteWithDeterministicEngine scales DIY purification time with room volume (20, 45, 120 m³)', () => {
+    const volumes = [20, 45, 120];
+    const cleanTimes = volumes.map((vol) => {
+      const hh: HouseholdProfile = { ...sampleHousehold, roomVolume: vol };
+      const fallback = generateFallbackAdvice(hh, sampleAirData, 'en');
+      const overwritten = overwriteWithDeterministicEngine(fallback, hh, sampleAirData);
+      const diy = overwritten.indoor.find((t) => t.tier === 'diy')!;
+
+      // Extract minutes from: "Cleans X m³ in ~Y minutes"
+      const match = diy.effect.match(/~(\d+)\s+minutes/);
+      expect(match).not.toBeNull();
+      const mins = parseInt(match![1]!, 10);
+      expect(Number.isInteger(mins)).toBe(true);
+      return mins;
+    });
+
+    // Clean times must strictly ascend with room volume
+    expect(cleanTimes[0]!).toBeLessThan(cleanTimes[1]!);
+    expect(cleanTimes[1]!).toBeLessThan(cleanTimes[2]!);
+
+    // Expected DIY physical values for CADR = 350 m³/h, eff = 0.90, target = 0.90:
+    // 20 m³: ~9 min, 45 m³: ~20 min, 120 m³: ~53 min
+    expect(cleanTimes[0]).toBe(Math.round(purificationTime(20, 350, 0.90, 0, 0.90).minutes));
+    expect(cleanTimes[1]).toBe(Math.round(purificationTime(45, 350, 0.90, 0, 0.90).minutes));
+    expect(cleanTimes[2]).toBe(Math.round(purificationTime(120, 350, 0.90, 0, 0.90).minutes));
+  });
+
+  it('overwriteWithDeterministicEngine overwrites all indoor tiers and all alternatives', () => {
+    const rawAdvice = generateFallbackAdvice(sampleHousehold, sampleAirData, 'en');
+    const overwritten = overwriteWithDeterministicEngine(rawAdvice, sampleHousehold, sampleAirData);
+
+    // Verify all 3 indoor tiers overwritten
+    expect(overwritten.indoor.length).toBe(3);
+    const diy = overwritten.indoor.find((t) => t.tier === 'diy')!;
+    const standard = overwritten.indoor.find((t) => t.tier === 'standard')!;
+    const premium = overwritten.indoor.find((t) => t.tier === 'premium')!;
+
+    expect(diy.assumptions).toContain('DIY Corsi-Rosenthal Box (CADR ~350 m³/h)');
+    expect(standard.effect).toContain('Certified HEPA rated for 240 m³/h CADR'); // 60 * 4 = 240
+    expect(premium.effect).toContain('Hospital-grade HEPA + Carbon rated for 360 m³/h CADR'); // 60 * 6 = 360
+
+    // Verify alternatives overwritten
+    expect(overwritten.alternatives.length).toBeGreaterThanOrEqual(2);
+    expect(typeof overwritten.alternatives[0]!.exposureDelta).toBe('number');
+    expect(typeof overwritten.alternatives[0]!.co2eDelta).toBe('number');
+    expect(typeof overwritten.alternatives[1]!.exposureDelta).toBe('number');
+    expect(typeof overwritten.alternatives[1]!.co2eDelta).toBe('number');
+  });
+
+  it('StructuredAdviceSchema validates well-formed advice and catches malformed payloads', () => {
+    const valid = generateFallbackAdvice(sampleHousehold, sampleAirData, 'en');
+    const parseResult = StructuredAdviceSchema.safeParse(valid);
+    expect(parseResult.success).toBe(true);
+
+    const invalid = { ...valid, verdict: { ...valid.verdict, level: 'super-bad' } };
+    const invalidResult = StructuredAdviceSchema.safeParse(invalid);
+    expect(invalidResult.success).toBe(false);
+  });
+
+  it('generateAdviceWithGemini falls back and deterministically overwrites when no API key is provided', async () => {
+    const advice = await generateAdviceWithGemini(sampleHousehold, sampleAirData, 'en');
+    expect(advice.verdict.level).toBeDefined();
+    expect(advice.indoor.length).toBe(3);
+    expect(advice.disclaimer).toContain('Not medical advice');
   });
 });

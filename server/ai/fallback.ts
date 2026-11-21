@@ -47,8 +47,14 @@ export function generateFallbackAdvice(
   else if (aqi <= 200) verdictLevel = 'unhealthy';
   else verdictLevel = 'hazardous';
 
+  const DIY_CADR = 350;
+  const diyPurifyMins = Math.round(purificationTime(household.roomVolume, DIY_CADR, 0.90, 0, 0.90).minutes);
+
   const cadrReq = cadrRequired(household.roomVolume, 4).cadrM3h;
-  const purifyMins = purificationTime(household.roomVolume, cadrReq, 0.9).minutes;
+  const stdPurifyMins = Math.round(purificationTime(household.roomVolume, cadrReq, 0.95, 0, 0.90).minutes);
+
+  const premCadrReq = cadrRequired(household.roomVolume, 6).cadrM3h;
+  const premPurifyMins = Math.round(purificationTime(household.roomVolume, premCadrReq, 0.99, 0, 0.90).minutes);
 
   if (lang === 'hi') {
     return {
@@ -87,8 +93,8 @@ export function generateFallbackAdvice(
             'कमरे में निरंतर मध्यम गति पर चलाएं।',
           ],
           costBand: '₹1,500 - ₹2,500',
-          effect: `कमरे के वायु को लगभग ${purifyMins} मिनट में शुद्ध करता है।`,
-          assumptions: [`कमरे का आयतन: ${household.roomVolume} m³`, '4 वायु परिवर्तन प्रति घंटा (ACH)'],
+          effect: `कमरे के वायु को लगभग ${diyPurifyMins} मिनट में 90% शुद्ध करता है।`,
+          assumptions: [`कमरे का आयतन: ${household.roomVolume} m³`, 'CADR ~350 m³/h', '90% कण निष्कासन समय'],
         },
         {
           tier: 'standard',
@@ -99,8 +105,8 @@ export function generateFallbackAdvice(
             'दरवाजे और खिड़कियां बंद रखें।',
           ],
           costBand: '₹7,000 - ₹12,000',
-          effect: '99.97% महीन कणों को फिल्टर करता है।',
-          assumptions: [`आवश्यक CADR: ${cadrReq} m³/h`],
+          effect: `99.97% महीन कणों को फिल्टर करता है (90% शुद्धिकरण ~${stdPurifyMins} मिनट)।`,
+          assumptions: [`आवश्यक CADR: ${cadrReq} m³/h`, `${household.roomVolume} m³ के लिए 4 ACH`],
         },
         {
           tier: 'premium',
@@ -111,8 +117,8 @@ export function generateFallbackAdvice(
             'CO2 स्तर की निगरानी करें और दोपहर में नियंत्रित वेंटिलेशन करें।',
           ],
           costBand: '₹20,000+',
-          effect: 'PM2.5, VOCs और गंध का संपूर्ण नियंत्रण।',
-          assumptions: ['स्मार्ट सेंसर स्वचालित गति नियंत्रण'],
+          effect: `PM2.5, VOCs और गंध का संपूर्ण नियंत्रण (90% शुद्धिकरण ~${premPurifyMins} मिनट)।`,
+          assumptions: [`आवश्यक CADR: ${premCadrReq} m³/h`, 'स्मार्ट सेंसर स्वचालित गति नियंत्रण'],
         },
       ],
       alternatives: [
@@ -121,8 +127,16 @@ export function generateFallbackAdvice(
           to: 'मेट्रो या रैपिड रेल',
           effort: 'मध्यम',
           exposureDelta: -35,
-          co2eDelta: -1.8,
+          co2eDelta: -1.35,
           assumptions: ['10 किमी यात्रा दूरी', 'DEFRA कार्बन उत्सर्जन मानक'],
+        },
+        {
+          from: 'दोपहिया वाहन यात्रा',
+          to: 'सार्वजनिक बस या मेट्रो',
+          effort: 'मध्यम',
+          exposureDelta: -45,
+          co2eDelta: 0.29,
+          assumptions: ['10 किमी शहरी यात्रा', 'सड़क पर सीधा धुआं संपर्क कटौती'],
         },
       ],
       disclaimer: 'यह सलाह केवल सामान्य पर्यावरण कल्याण के लिए है, किसी बीमारी का चिकित्सकीय निदान नहीं है।',
@@ -166,8 +180,8 @@ export function generateFallbackAdvice(
           'Run on medium speed in central living or sleeping space.',
         ],
         costBand: '$40 - $70 (₹2,500 - ₹4,500)',
-        effect: `Delivers ~300-400 m³/h CADR; cleans ${household.roomVolume} m³ in ~${purifyMins} mins.`,
-        assumptions: [`Room volume: ${household.roomVolume} m³`, 'Target ACH: 4.0'],
+        effect: `Delivers ~350 m³/h CADR; cleans ${household.roomVolume} m³ in ~${diyPurifyMins} mins (90% particle clearance).`,
+        assumptions: [`Room volume: ${household.roomVolume} m³`, 'CADR ~350 m³/h', '90% clearance time'],
       },
       {
         tier: 'standard',
@@ -178,8 +192,8 @@ export function generateFallbackAdvice(
           'Keep bedroom doors closed while operating continuously on auto/medium mode.',
         ],
         costBand: '$120 - $220 (₹9,000 - ₹15,000)',
-        effect: 'Traps 99.97% of PM2.5 and allergen particulates.',
-        assumptions: [`Calculated required CADR: ${cadrReq} m³/h`],
+        effect: `Certified HEPA rated for ${cadrReq} m³/h CADR (90% clearance in ~${stdPurifyMins} mins).`,
+        assumptions: [`Calculated required CADR: ${cadrReq} m³/h for 4 ACH`],
       },
       {
         tier: 'premium',
@@ -190,8 +204,8 @@ export function generateFallbackAdvice(
           'Monitor indoor CO2 and execute brief ventilation flushes during lowest AQI hours.',
         ],
         costBand: '$350+ (₹25,000+)',
-        effect: 'Comprehensive protection against fine particles and harmful gaseous co-pollutants.',
-        assumptions: ['Includes active air quality monitoring sensor'],
+        effect: `Hospital-grade HEPA + Carbon rated for ${premCadrReq} m³/h CADR (6 ACH, 90% clearance in ~${premPurifyMins} mins).`,
+        assumptions: [`Target CADR: ${premCadrReq} m³/h for 6 ACH protection`, 'Includes active air quality monitoring sensor'],
       },
     ],
     alternatives: [
@@ -200,7 +214,7 @@ export function generateFallbackAdvice(
         to: 'Metro Transit + First/Last-Mile Walk with N95 Mask',
         effort: 'Low-Medium',
         exposureDelta: -28,
-        co2eDelta: -1.75,
+        co2eDelta: -1.35,
         assumptions: [
           '10 km daily commute baseline',
           'Cabin filter assumption: moderate leakage in congested traffic',
@@ -211,8 +225,8 @@ export function generateFallbackAdvice(
         from: 'Motorbike / Open Two-Wheeler Commute',
         to: 'Air-Conditioned Public Bus or Metro',
         effort: 'Medium',
-        exposureDelta: -42,
-        co2eDelta: -0.9,
+        exposureDelta: -35,
+        co2eDelta: 0.29,
         assumptions: ['Direct exhaust plume exposure on two-wheelers is 2-3x ambient background'],
       },
     ],
