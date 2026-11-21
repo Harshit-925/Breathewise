@@ -2,13 +2,13 @@
   "name": "Breathewise",
   "workingTitle": "GenAI Urban Air Quality Assistant",
   "version": "0.1.0",
-  "generatedAt": "2026-11-21T18:34:28.187Z",
+  "generatedAt": "2026-11-21T18:57:47.045Z",
   "evaluationCategoryScorecards": {
     "codeQuality": {
       "status": "Verified",
       "evidence": "CODE_QUALITY.md",
       "verificationCommand": "npm run lint && npm run typecheck",
-      "notes": "TypeScript strict mode with zero any, oxlint 100% clean on 75 files with .oxlintrc.json and .pre-commit-config.yaml."
+      "notes": "TypeScript strict mode with zero any, oxlint 100% clean on 76 files with .oxlintrc.json and .pre-commit-config.yaml."
     },
     "security": {
       "status": "Verified",
@@ -20,13 +20,13 @@
       "status": "Verified",
       "evidence": "EFFICIENCY.md",
       "verificationCommand": "npm run build",
-      "notes": "Client gzip bundle size 96.52 kB JS + 8.30 kB CSS. Multi-tier LRU cache for geocode, air quality, weather, and AI responses."
+      "notes": "Client gzip bundle size 97.42 kB JS + 8.42 kB CSS. Multi-tier LRU cache for geocode, air quality, weather, and AI responses."
     },
     "testing": {
       "status": "Verified",
       "evidence": "TESTING.md",
       "verificationCommand": "npm test",
-      "notes": "135 tests passing across 8 suites (engine, adapters, api, ai, rendering, dom, a11y, journey). 100% pass rate."
+      "notes": "136 tests passing across 8 suites (engine, adapters, api, ai, rendering, dom, a11y, journey). 100% pass rate."
     },
     "accessibility": {
       "status": "Verified",
@@ -43,13 +43,13 @@
   },
   "testMetrics": {
     "totalSuites": 8,
-    "totalTests": 135,
-    "passed": 135,
+    "totalTests": 136,
+    "passed": 136,
     "failed": 0,
     "suites": {
       "engine": 62,
       "api": 15,
-      "ai": 18,
+      "ai": 19,
       "rendering": 12,
       "adapters": 12,
       "dom": 10,
@@ -58,10 +58,10 @@
     }
   },
   "bundleMetrics": {
-    "clientJsKb": 317.47,
-    "clientJsGzipKb": 96.52,
-    "clientCssKb": 45.07,
-    "clientCssGzipKb": 8.3,
+    "clientJsKb": 320.77,
+    "clientJsGzipKb": 97.42,
+    "clientCssKb": 46,
+    "clientCssGzipKb": 8.42,
     "clientHtmlKb": 0.82,
     "clientHtmlGzipKb": 0.48
   },

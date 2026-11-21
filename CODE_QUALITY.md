@@ -35,7 +35,7 @@ Breathewise maintains strict code health, modular architectural boundaries, dete
 | Claim | Evidence | Verification Command |
 |---|---|---|
 | **Zero `any` Types** | Full TypeScript strict type coverage across client, server, and engine | `npm run typecheck` |
-| **Zero Linter Warnings** | 71 files checked against 97 ESLint/Oxlint rules with 0 errors and 0 warnings | `npm run lint` |
+| **Zero Linter Warnings** | 76 files checked against 97 ESLint/Oxlint rules with 0 errors and 0 warnings | `npm run lint` |
 | **Pure Engine Calculations** | All engine functions in `src/lib/engine/` are pure and side-effect free | `npx vitest run src/test/engine.test.ts` (62 tests) |
 | **Documented Constants** | Every constant in `src/lib/constants.ts` cites a source key | Inspect `src/lib/constants.ts` |
 | **Engine Overwrite Enforced** | Gemini outputs are overwritten by deterministic math before returning to user | `server/ai/gemini.ts#L60-L95`, `src/test/ai.test.ts` |

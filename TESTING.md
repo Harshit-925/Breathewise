@@ -1,6 +1,6 @@
 # Automated Testing Report & Test Suite Inventory
 
-Breathewise is protected by **135 automated tests** spanning 8 test suites. Every test is passing with 100% green status under Vitest.
+Breathewise is protected by **136 automated tests** spanning 8 test suites. Every test is passing with 100% green status under Vitest.
 
 ## Test Summary
 
@@ -8,13 +8,13 @@ Breathewise is protected by **135 automated tests** spanning 8 test suites. Ever
 |---|---|---|---|
 | **Deterministic Engine** | `src/test/engine.test.ts` | **62** | EPA 2024 breakpoints, WHO multiple, CADR required, decay math, inhaled dose, transport modes, stagnation heuristic, edge cases (NaN/negative). |
 | **API Gateway & Routes** | `src/test/api.test.ts` | **15** | Health check, usage stats, geocoding validation, air route validation, advice generation, SSE streaming chat, emergency redirect, rate limits, strict schema rejection. |
-| **AI Layer & Guardrails** | `src/test/ai.test.ts` | **18** | Input sanitization, null byte removal, prompt wrapping, emergency medical context detection (EN & Hindi), off-topic detection, LRU response cache hashing, fallback plan generation, room volume CADR scaling (20, 45, 120 m³), all indoor tiers & alternatives deterministic overwrite, StructuredAdviceSchema validation, Gemini fallback path. |
+| **AI Layer & Guardrails** | `src/test/ai.test.ts` | **19** | Input sanitization, null byte removal, prompt wrapping, emergency medical context detection (EN & Hindi), off-topic detection, LRU response cache hashing, fallback plan generation, room volume CADR scaling (20, 45, 120 m³), all indoor tiers & alternatives deterministic overwrite, mode-matching delta calculation, StructuredAdviceSchema validation, Gemini fallback path. |
 | **Data Adapters** | `src/test/adapters.test.ts` | **12** | Open-Meteo geocode search, query normalization, air quality 24h forecast, weather adapter, in-memory caching, mock fallback on network timeout. |
 | **UI Rendering & A11y Twins**| `src/test/rendering.test.tsx`| **12** | AqiBadge color independence, Sparkline SVG and sr-only twins, Disclaimer visibility, LoadingSpinner live region, VerdictCard, AirSnapshot, Header badges. |
 | **DOM Events & Interactions** | `src/test/dom.test.tsx` | **10** | Tab navigation clicks, Arrow key roving focus, Theme toggle persistence, Language switch, CADR calculator updates, Impact meter live checkboxes, Community pledges. |
 | **WCAG 2.2 Accessibility** | `src/test/a11y.test.tsx` | **5** | Skip-to-content landmark, ARIA tablist/tab structure, role="status" announcements, accessible landmarks, keyboard focusable targets. |
 | **End-to-End User Journey** | `src/test/journey.test.tsx` | **1** | Full flow: load air data -> navigate tabs -> calculate CADR -> toggle impact options -> pledge clean transit -> verify persistence -> clear data. |
-| **Total Automated Tests** | **8 Test Suites** | **135** | **All 135 tests passing (100% pass rate)** |
+| **Total Automated Tests** | **8 Test Suites** | **136** | **All 136 tests passing (100% pass rate)** |
 
 ---
 
@@ -33,12 +33,13 @@ Breathewise is protected by **135 automated tests** spanning 8 test suites. Ever
 - Tests emergency redirect trigger when medical distress terms appear in prompt.
 - Tests CORS rejection when unknown origins connect.
 
-### 3. AI Layer & Guardrails (`src/test/ai.test.ts` — 18 tests)
+### 3. AI Layer & Guardrails (`src/test/ai.test.ts` — 19 tests)
 - Verifies that `sanitizeUserInput` strips null bytes (`\x00`) and control characters.
 - Tests English and Hindi emergency keywords in clinical context.
 - Tests deterministic fallback plan when no API key is supplied.
-- Tests room volume scaling: verifies that 20 m³, 45 m³, and 120 m³ rooms produce strictly ascending clean times matching the physical Corsi-Rosenthal formula (~9, ~20, ~53 min).
+- Tests room volume scaling: verifies that 20 m³, 45 m³, and 120 m³ rooms produce strictly ascending clean times matching the physical Corsi-Rosenthal formula (~8, ~18, ~47 min for target 0.90, eff = 1.0).
 - Tests that all three indoor tiers (DIY, Standard, Premium) and all alternatives have their numbers strictly overwritten by the deterministic engine.
+- Tests mode-matching commute alternative overwrite: matches alternative by parsed from/to transport modes, dynamically recomputing exposure and carbon deltas via `compareModes`, while deterministically overwriting `verdict.why` and `routine[i].impact`.
 - Tests `StructuredAdviceSchema` validation against schema tampering.
 
 ---
@@ -46,7 +47,7 @@ Breathewise is protected by **135 automated tests** spanning 8 test suites. Ever
 ## How to Run the Tests
 
 ```bash
-# Run all 135 tests:
+# Run all 136 tests:
 npm test
 
 # Run tests in watch mode:

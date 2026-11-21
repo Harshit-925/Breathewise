@@ -1,14 +1,15 @@
 # Breathewise — GenAI Urban Air Quality Assistant
 
 [![CI/CD](https://github.com/Harshit-925/Breathewise/actions/workflows/ci.yml/badge.svg)](https://github.com/Harshit-925/Breathewise/actions/workflows/ci.yml)
-[![Deployment](https://img.shields.io/badge/Deployment-Vercel%20Full--Stack-black)](https://vercel.com)
-[![Tests](https://img.shields.io/badge/Tests-135%20passing-success)](https://github.com/Harshit-925/Breathewise)
-[![Bundle Size](https://img.shields.io/badge/Client%20Bundle-96.52%20kB%20gzip-informational)](https://github.com/Harshit-925/Breathewise)
+[![Deployment](https://img.shields.io/badge/Deployment-Vercel%20Full--Stack-black)](https://breathewise.vercel.app)
+[![Tests](https://img.shields.io/badge/Tests-136%20passing-success)](https://github.com/Harshit-925/Breathewise)
+[![Bundle Size](https://img.shields.io/badge/Client%20Bundle-97.42%20kB%20gzip-informational)](https://github.com/Harshit-925/Breathewise)
 [![WCAG 2.2 AA](https://img.shields.io/badge/A11y-WCAG%202.2%20AA-blueviolet)](https://github.com/Harshit-925/Breathewise)
 [![Privacy](https://img.shields.io/badge/Privacy-Local--First%20(Zero%20PII)-blue)](https://github.com/Harshit-925/Breathewise)
 
 > A privacy-first, evidence-grounded urban environmental health platform designed to help families and communities navigate severe winter smog and urban air pollution. Powered by real-time CAMS atmospheric data, a pure deterministic mathematical engine, and defensive GenAI guidance.
 
+🌐 **Live Web Application**: [https://breathewise.vercel.app](https://breathewise.vercel.app)  
 📁 **Repository**: [https://github.com/Harshit-925/Breathewise](https://github.com/Harshit-925/Breathewise)
 
 ---
@@ -151,7 +152,7 @@ npm run dev:server    # Starts Express API gateway (http://localhost:3001)
 # 5. Run Verification Checks
 npm run typecheck     # TypeScript strict compilation check
 npm run lint          # Oxlint static analysis
-npm test              # Run all 135 Vitest tests
+npm test              # Run all 136 Vitest tests
 npm run build         # Production Vite build
 npm run build:server  # Production server build
 ```
@@ -181,7 +182,7 @@ Breathewise operates under a strict defense-in-depth security model:
 - Emergency medical symptom detection with immediate healthcare redirection.
 - CWE-209 protection: Centralized error handling suppresses internal stack traces, system paths, and runtime errors.
 
-*See [`SECURITY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/SECURITY.md) for full OWASP Top 10 mapping and evidence.*
+*See [`SECURITY.md`](./SECURITY.md) for full OWASP Top 10 mapping and evidence.*
 
 ---
 
@@ -194,23 +195,23 @@ Breathewise conforms to WCAG 2.2 Level AA accessibility guidelines:
 - Every inline SVG chart features an adjacent `.sr-only` text equivalent describing values and trends.
 - Token streaming updates use `aria-live="polite"`.
 
-*See [`ACCESSIBILITY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/ACCESSIBILITY.md) for full evidence.*
+*See [`ACCESSIBILITY.md`](./ACCESSIBILITY.md) for full evidence.*
 
 ---
 
 ## 7. Automated Test Results
 
-The test suite runs **135 tests across 8 test suites** with a **100% pass rate**:
+The test suite runs **136 tests across 8 test suites** with a **100% pass rate**:
 
 ```
 Test Files  8 passed (8)
-     Tests  135 passed (135)
+     Tests  136 passed (136)
 ```
 
 | Suite | File | Tests | Status |
 |---|---|---|---|
 | **Deterministic Engine** | `src/test/engine.test.ts` | 62 | ✅ Passed |
-| **AI Layer & Guardrails** | `src/test/ai.test.ts` | 18 | ✅ Passed |
+| **AI Layer & Guardrails** | `src/test/ai.test.ts` | 19 | ✅ Passed |
 | **API Gateway & Routes** | `src/test/api.test.ts` | 15 | ✅ Passed |
 | **Data Adapters** | `src/test/adapters.test.ts` | 12 | ✅ Passed |
 | **UI Rendering & A11y Twins** | `src/test/rendering.test.tsx` | 12 | ✅ Passed |
@@ -218,7 +219,7 @@ Test Files  8 passed (8)
 | **WCAG 2.2 Accessibility** | `src/test/a11y.test.tsx` | 5 | ✅ Passed |
 | **End-to-End User Journey** | `src/test/journey.test.tsx` | 1 | ✅ Passed |
 
-*See [`TESTING.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/TESTING.md) for detailed test breakdown.*
+*See [`TESTING.md`](./TESTING.md) for detailed test breakdown.*
 
 ---
 
@@ -228,12 +229,12 @@ Test Files  8 passed (8)
 
 | Category | Status | Evidence Document | Verification Command | Caveats / Notes |
 |---|---|---|---|---|
-| **Code Quality** | **Verified** | [`CODE_QUALITY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/CODE_QUALITY.md) | `npm run lint && npm run typecheck` | Zero `any` in TypeScript; oxlint passes with 0 warnings on 75 files. Tooling configs: `.oxlintrc.json`, `.pre-commit-config.yaml`. |
-| **Security** | **Verified** | [`SECURITY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/SECURITY.md) | `npx vitest run src/test/api.test.ts` | Server-side key custody, Helmet CSP, exact CORS, 16KB body limit, OWASP Top 10 mapped, CWE-209 error masking. |
-| **Efficiency** | **Verified** | [`EFFICIENCY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/EFFICIENCY.md) | `npm run build` | Sub-100 kB JS gzip bundle (96.52 kB JS + 8.30 kB CSS); multi-tier LRU cache. |
-| **Testing** | **Verified** | [`TESTING.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/TESTING.md) | `npm test` | 135 tests passing across 8 suites (engine, API, AI, adapters, UI, DOM, a11y, journey). |
-| **Accessibility** | **Verified** | [`ACCESSIBILITY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/ACCESSIBILITY.md) | `npx vitest run src/test/a11y.test.tsx` | WCAG 2.2 AA compliant. Skip link, ARIA tablist, text twins for SVG charts. |
-| **Problem Alignment** | **Verified** | [`PROBLEM_ALIGNMENT.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/PROBLEM_ALIGNMENT.md) | `npx vitest run src/test/journey.test.tsx` | Full coverage of Challenge 6 winter smog navigation, 6 named personas, and diurnal commute exposure optimization. Empirical parameters (exposure multipliers, I/O ratios) explicitly marked as Partial / Empirical in standards appendix. |
+| **Code Quality** | **Verified** | [`CODE_QUALITY.md`](./CODE_QUALITY.md) | `npm run lint && npm run typecheck` | Zero `any` in TypeScript; oxlint passes with 0 warnings on 76 files. Tooling configs: `.oxlintrc.json`, `.pre-commit-config.yaml`. |
+| **Security** | **Verified** | [`SECURITY.md`](./SECURITY.md) | `npx vitest run src/test/api.test.ts` | Server-side key custody, Helmet CSP, exact CORS, 16KB body limit, OWASP Top 10 mapped, CWE-209 error masking. |
+| **Efficiency** | **Verified** | [`EFFICIENCY.md`](./EFFICIENCY.md) | `npm run build` | Sub-100 kB JS gzip bundle (97.42 kB JS + 8.42 kB CSS); multi-tier LRU cache. |
+| **Testing** | **Verified** | [`TESTING.md`](./TESTING.md) | `npm test` | 136 tests passing across 8 suites (engine, API, AI, adapters, UI, DOM, a11y, journey). |
+| **Accessibility** | **Verified** | [`ACCESSIBILITY.md`](./ACCESSIBILITY.md) | `npx vitest run src/test/a11y.test.tsx` | WCAG 2.2 AA compliant. Skip link, ARIA tablist, text twins for SVG charts. |
+| **Problem Alignment** | **Verified** | [`PROBLEM_ALIGNMENT.md`](./PROBLEM_ALIGNMENT.md) | `npx vitest run src/test/journey.test.tsx` | Full coverage of Challenge 6 winter smog navigation, 6 named personas, and diurnal commute exposure optimization. Empirical parameters (exposure multipliers, I/O ratios) explicitly marked as Partial / Empirical in standards appendix. |
 
 ---
 
@@ -275,7 +276,7 @@ Breathewise/
 │   │   └── constants.ts            # EPA breakpoints, WHO guidelines, CADR, breathing rates
 │   ├── services/                   # apiService.ts, storageService.ts
 │   ├── i18n/                       # en.json, hi.json
-│   ├── test/                       # 8 test suites (135 tests)
+│   ├── test/                       # 8 test suites (136 tests)
 │   ├── App.tsx                     # Main application shell
 │   ├── main.tsx                    # React 19 entry point
 │   ├── index.css                   # Tailwind v4 styles & accessibility focus rings

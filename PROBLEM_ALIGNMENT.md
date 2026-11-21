@@ -51,20 +51,25 @@ Breathewise explicitly models six distinct urban personas vulnerable to winter a
 
 ## 3. Standards and Sources Appendix
 
-Every numerical constant in Breathewise is tied to a primary scientific standard or peer-reviewed empirical study. The table below delineates verified official regulatory standards from empirical literature approximations:
+Every numerical constant in Breathewise is tied to a primary scientific standard or peer-reviewed empirical study. The table below provides complete citations, verified URLs/DOIs, retrieval dates, and verification statuses:
 
-| Parameter Category | Primary Scientific / Regulatory Source | Verification Status | Source Reference & Retrieval Date |
-|---|---|---|---|
-| **PM2.5 AQI Breakpoints** | US EPA 40 CFR Part 58 (2024 Revised NAAQS for PM) | **Verified Standard** | [US EPA PM Standards](https://www.epa.gov/pm-pollution) (May 2024) |
-| **Clean Air Benchmarks** | WHO Global Air Quality Guidelines (2021) | **Verified Standard** | [WHO Guidelines 2021](https://www.who.int/publications/i/item/9789240034228) (Feb 2024) |
-| **CADR & Decay Dynamics** | AHAM AC-1 & EPA Clean Air in Buildings | **Verified Standard** | [EPA Indoor Air Cleaners](https://www.epa.gov/indoor-air-quality-iaq) (Jan 2024) |
-| **Adult Inhalation Rates** | US EPA Exposure Factors Handbook (2011), Table 6-2 | **Verified Standard** | [EPA Expobox Table 6-2](https://www.epa.gov/expobox) (Feb 2024) |
-| **Infant/Elderly Inhalation** | Extrapolated from EPA pediatric & geriatric ranges | **Empirical Estimate** | Age-bracket literature normalization (Feb 2024) |
-| **N95 Mask Filtration** | NIOSH TEB-APR-STP-0059 / 3M Technical Bulletin (2020) | **Verified Standard** | [3M Bioaerosols Bulletin](https://multimedia.3m.com) (Mar 2024) |
-| **Surgical & Cloth Masks** | Davies et al. (2013) & Shakya et al. (2017) | **Empirical Estimate** | Disaster Med & J Expo Sci (Mar 2024) |
-| **Transport Emissions** | UK DEFRA GHG Factors (2024) & CPCB Vehicle Guidelines | **Verified Standard** | [UK DEFRA Conversion 2024](https://www.gov.uk) (Jun 2024) |
-| **Transport Exposure Multipliers** | Cepeda et al. (2017), Int. J. Environ. Res. Public Health | **Partial / Empirical** | Literature commuter exposure ratios (May 2024) |
-| **Building I/O Penetration** | Chen & Zhao (2011), Building and Environment | **Partial / Empirical** | Residential envelope infiltration studies (May 2024) |
+| Parameter Category | Primary Scientific / Regulatory Source | Verification Status | Source Reference & URL | Retrieval Date |
+|---|---|---|---|---|
+| **PM2.5 AQI Breakpoints** | US EPA 40 CFR Part 58 (89 FR 16202, May 2024 Revised NAAQS) | **Verified Standard** | [US Federal Register 2024-04317](https://www.federalregister.gov/documents/2024/03/06/2024-04317/reconsideration-of-the-national-ambient-air-quality-standards-for-particulate-matter) | 2024-05-15 |
+| **Clean Air Benchmarks** | WHO Global Air Quality Guidelines (2021) | **Verified Standard** | [WHO Guidelines IRIS 10665/345329](https://iris.who.int/handle/10665/345329) | 2024-02-10 |
+| **CADR Clean Air Metric** | ANSI/AHAM AC-1-2020 & EPA Clean Air in Buildings | **Verified Standard** | [US EPA Guide to Air Cleaners](https://www.epa.gov/indoor-air-quality-iaq/air-cleaners-and-air-filters-home) | 2024-01-20 |
+| **DIY Corsi-Rosenthal Box** | Rosenthal, J. (2020), UC Davis Air Quality Research Center | **Verified Benchmark** | [UC Davis AQRC Corsi-Rosenthal Box](https://aqrc.ucdavis.edu/news/corsi-rosenthal-box-air-filter) | 2024-01-20 |
+| **Adult Inhalation Rates** | US EPA Exposure Factors Handbook (2011), Chapter 6: Table 6-2 | **Verified Standard** | [US EPA Expobox Chapter 6](https://www.epa.gov/expobox/exposure-factors-handbook-chapter-6) | 2024-02-18 |
+| **Infant/Elderly Inhalation** | US EPA Exposure Factors Handbook (2011), Table 6-1 & 6-2 | **Empirical Estimate** | [US EPA National Center for Env Assessment](https://cfpub.epa.gov/ncea/risk/recordisplay.cfm?deid=236252) | 2024-02-18 |
+| **N95 Respirator Filtration** | NIOSH 42 CFR Part 84 / 3M Technical Bulletin (2020) | **Verified Standard** | [3M Respiratory Protection Bulletin](https://multimedia.3m.com/mws/media/409903O/respiratory-protection-against-bioaerosols.pdf) | 2024-03-12 |
+| **Surgical Mask Efficacy** | Davies et al. (2013), Disaster Med Public Health Prep | **Empirical Estimate** | [DOI: 10.1017/dmp.2013.43](https://doi.org/10.1017/dmp.2013.43) | 2024-03-14 |
+| **Cloth Mask Filtration** | Shakya et al. (2017), J Expo Sci Environ Epidemiol | **Empirical Estimate** | [DOI: 10.1038/jes.2016.42](https://doi.org/10.1038/jes.2016.42) | 2024-03-14 |
+| **Transport GHG Factors** | UK DESNZ / DEFRA (2024) Conversion Factors & CPCB | **Verified Standard** | [UK DEFRA GHG Factors 2024](https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2024) | 2024-06-15 |
+| **Vehicular Plume Ratios** | Goel et al. (2015), Atmospheric Environment 123: 129-138 | **Partial / Empirical** | [DOI: 10.1016/j.atmosenv.2015.10.037](https://doi.org/10.1016/j.atmosenv.2015.10.037) | 2024-05-18 |
+| **Mode Exposure Ratios** | Cepeda et al. (2017), The Lancet Public Health 2(1): e23-e34 | **Partial / Empirical** | [DOI: 10.1016/S2468-2667(16)30021-4](https://doi.org/10.1016/S2468-2667(16)30021-4) | 2024-05-18 |
+| **Building I/O Infiltration** | Chen, C., & Zhao, B. (2011), Atmos Environ 45(2): 275-288 | **Partial / Empirical** | [DOI: 10.1016/j.atmosenv.2010.09.048](https://doi.org/10.1016/j.atmosenv.2010.09.048) | 2024-05-20 |
+| **Community Pledges (AR6)** | IPCC Sixth Assessment Report (AR6), Working Group III | **Verified Model** | [IPCC AR6 WG3 Report](https://www.ipcc.ch/report/ar6/wg3/) | 2024-04-10 |
+| **Boundary Layer Stagnation** | NOAA Air Resources Lab (ARL) Air Stagnation Index | **Meteorological Model** | [NOAA ARL Research](https://www.arl.noaa.gov/research/air-quality/) | 2024-04-22 |
 
 ### A. US EPA PM2.5 Breakpoints (Revised 2024 Table)
 - **Standard**: US EPA Revised National Ambient Air Quality Standards for Particulate Matter (Effective May 2024).
@@ -80,13 +85,13 @@ Every numerical constant in Breathewise is tied to a primary scientific standard
 - **Code Reference**: `src/lib/constants.ts` (`WHO_GUIDELINES`), `src/lib/engine/aqi.ts`.
 
 ### C. Clean Air Delivery Rate (CADR) & First-Order Decay
-- **Standards**: Association of Home Appliance Manufacturers (AHAM AC-1) and EPA Clean Air in Buildings Guidelines.
+- **Standards**: Association of Home Appliance Manufacturers (ANSI/AHAM AC-1-2020) and US EPA Clean Air in Buildings Guidelines.
+- **Physical Invariant**: Clean Air Delivery Rate ($\text{CADR} = Q \times \eta$) by definition represents the equivalent volume of 100% clean air delivered per hour, already incorporating single-pass filtration efficiency $\eta$. Efficiency is therefore not double-discounted in decay modeling.
 - **Formulas**:
-  - Required CADR:
+  - Required Room CADR (for target ACH):
     $$\text{CADR}_{\text{required}} = V_{\text{room}} \times \text{ACH}_{\text{target}}$$
-  - Exponential Particle Decay Time:
-    $$t_{90\%} = -\frac{V}{\text{CADR} \times \eta} \ln(0.10) \times 60$$
-    where $\eta = 0.90$ for 90% particle clearance.
+  - Exponential 90% Particle Decay Time:
+    $$t_{90\%} = -\frac{V}{\text{CADR}} \ln(0.10) \times 60 \approx \frac{2.3026 \times V}{\text{CADR}} \times 60 \text{ minutes}$$
 - **DIY Corsi-Rosenthal Box Benchmark**: 4× MERV-13 filters + 20" box fan delivering fixed $\text{CADR} \approx 350 \ \text{m}^3/\text{h}$, scaling clean time proportionally to room volume.
 - **Code Reference**: `src/lib/constants.ts`, `src/lib/engine/cadr.ts`.
 
@@ -103,7 +108,7 @@ Every numerical constant in Breathewise is tied to a primary scientific standard
 - **Code Reference**: `src/lib/constants.ts` (`BREATHING_RATES`, `MASK_EFFICIENCY`), `src/lib/engine/exposure.ts`.
 
 ### E. Passenger Transport Emission & Physics Factors
-- **Standards**: UK Department for Environment, Food & Rural Affairs (DEFRA 2024 Greenhouse Gas Reporting Conversion Factors) & India Central Pollution Control Board (CPCB) urban transport emission factors.
+- **Standards**: UK Department for Energy Security and Net Zero (DESNZ) / DEFRA (2024) Greenhouse Gas Conversion Factors & CPCB Urban Transport Emission Guidelines.
 - **Physical Modeling (`MODE_PHYSICS`)**:
   - Solo Petrol/Diesel Car: $0.170 \ \text{kg CO}_2\text{e/km}$, $22 \ \text{km/h}$, $12 \ \text{L/min}$ breathing
   - Battery Electric Car: $0.050 \ \text{kg CO}_2\text{e/km}$, $22 \ \text{km/h}$, $12 \ \text{L/min}$ breathing
@@ -115,5 +120,5 @@ Every numerical constant in Breathewise is tied to a primary scientific standard
 - **Code Reference**: `src/lib/constants.ts` (`EMISSION_FACTORS`, `MODE_PHYSICS`), `src/lib/engine/modes.ts`.
 
 ### F. Data Attribution & API Compliance
-- **Data Source**: CAMS (Copernicus Atmosphere Monitoring Service) ENSEMBLE model & ECMWF forecasts accessed via Open-Meteo Air Quality & Weather API.
+- **Data Source**: CAMS (Copernicus Atmosphere Monitoring Service) ENSEMBLE model & ECMWF forecasts accessed via Open-Meteo Air Quality & Weather API ([https://open-meteo.com/en/docs/air-quality-api](https://open-meteo.com/en/docs/air-quality-api)).
 - **Attribution Display**: Prominently displayed in header, air snapshot, and global application footer.
