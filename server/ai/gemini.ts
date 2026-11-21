@@ -28,7 +28,7 @@ export async function generateAdviceWithGemini(
     return overwriteWithDeterministicEngine(fallback, household, airData);
   }
 
-  const modelName = process.env['GEMINI_MODEL'] ?? 'gemini-2.0-flash';
+  const modelName = process.env['GEMINI_MODEL'] ?? 'gemini-2.5-flash';
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);

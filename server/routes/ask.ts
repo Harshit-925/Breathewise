@@ -27,7 +27,7 @@ askRouter.post('/', aiRateLimiter, async (req: Request, res: Response, next: Nex
       return;
     }
 
-    const modelName = process.env['GEMINI_MODEL_LITE'] ?? 'gemini-2.0-flash-lite';
+    const modelName = process.env['GEMINI_MODEL_LITE'] ?? 'gemini-2.5-flash-lite';
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
       model: modelName,
