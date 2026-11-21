@@ -33,8 +33,8 @@ export function createSecurityMiddleware() {
     crossOriginEmbedderPolicy: false,
   });
 
-  // Body limit 100KB to prevent memory exhaustion attacks
-  const jsonParser = express.json({ limit: '100kb' });
+  // Body limit 16KB to prevent memory exhaustion / payload bomb attacks
+  const jsonParser = express.json({ limit: '16kb' });
 
   return [helmetMiddleware, corsMiddleware, jsonParser];
 }

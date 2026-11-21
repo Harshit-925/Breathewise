@@ -1,0 +1,24 @@
+repos:
+  - repo: https://github.com/oxc-project/oxlint
+    rev: v0.12.0
+    hooks:
+      - id: oxlint
+        name: oxlint fast linter
+        entry: npx oxlint
+        language: system
+        types: [javascript, jsx, ts, tsx]
+        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: typecheck
+        name: typecheck (strict tsc)
+        entry: npm run typecheck
+        language: system
+        pass_filenames: false
+
+      - id: test
+        name: vitest automated test suite
+        entry: npm test
+        language: system
+        pass_filenames: false
