@@ -35,6 +35,12 @@ export function isStaticHost(): boolean {
 }
 
 function getUrl(path: string): string {
+  const envBase = typeof import.meta !== 'undefined'
+    ? (import.meta as unknown as { env?: Record<string, string> }).env?.['VITE_API_BASE_URL']
+    : undefined;
+  if (envBase) {
+    return `${envBase.replace(/\/$/, '')}${path}`;
+  }
   if (typeof window !== 'undefined' && window.location?.origin && window.location.origin !== 'null' && !window.location.origin.startsWith('file:')) {
     return path;
   }

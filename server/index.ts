@@ -41,7 +41,7 @@ export function createApp() {
 const app = createApp();
 const PORT = process.env['PORT'] ?? 3001;
 
-if (process.env['NODE_ENV'] !== 'test') {
+if (process.env['NODE_ENV'] !== 'test' && !process.env['VERCEL']) {
   app.listen(PORT, () => {
     console.log(`Breathewise API Gateway running on port ${PORT}`);
   });

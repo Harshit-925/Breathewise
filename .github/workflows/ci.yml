@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI Pipeline
 
 on:
   push:
@@ -9,16 +9,10 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: 'pages'
-  cancel-in-progress: false
 
 jobs:
   verify:
-    name: Lint, Test & Build
+    name: Lint, Test, Security & Build
     runs-on: ubuntu-latest
     env:
       USE_MOCKS: 'true'
@@ -27,6 +21,13 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks Secret Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js 22
         uses: actions/setup-node@v4
@@ -37,41 +38,23 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Security Vulnerability Audit
+        run: npm audit --omit=dev --audit-level=critical
+
       - name: Run Linter (Oxlint)
         run: npm run lint
 
       - name: TypeScript Strict Typecheck
         run: npm run typecheck
 
-      - name: Run Automated Test Suites (131 Tests)
+      - name: Run Automated Test Suites
         run: npm test
 
       - name: Build Server Gateway
         run: npm run build:server
 
       - name: Build Production Client
-        env:
-          GITHUB_PAGES: 'true'
         run: npm run build
 
       - name: Verify Metadata Generation
         run: npx tsx scripts/generate-metadata.ts
-
-      - name: Upload GitHub Pages Artifact
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./dist
-
-  deploy:
-    name: Deploy to GitHub Pages
-    needs: verify
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
