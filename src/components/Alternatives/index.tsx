@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAirData } from '../../hooks/useAirData.js';
 import { useAdvice } from '../../hooks/useAdvice.js';
 import { compareModes } from '../../lib/engine/modes.js';
+import { MODE_EXPOSURE_MULTIPLIER } from '../../lib/constants.js';
 import type { TransportMode } from '../../types/index.js';
 import { LoadingSpinner } from '../shared/LoadingSpinner.js';
 
@@ -23,9 +24,39 @@ export const AlternativesView: React.FC = () => {
 
   const [distanceKm, setDistanceKm] = useState<number>(10);
   const [durationMins, setDurationMins] = useState<number>(30);
+  const [selectedTravelMode, setSelectedTravelMode] = useState<TransportMode>('two_wheeler');
 
   const pm25 = airData?.pm25 ?? 90;
   const comparison = compareModes({ distanceKm, durationMinutes: durationMins }, pm25, ALL_MODES);
+
+  // Calculate diurnal commute exposure windows (6 AM to 9 PM)
+  const hourlyWindows = (airData?.hourly && airData.hourly.length > 0)
+    ? airData.hourly
+        .filter((h) => h.hour >= 6 && h.hour <= 21)
+        .map((h) => {
+          const multiplier = MODE_EXPOSURE_MULTIPLIER[selectedTravelMode] ?? 1;
+          const breathingRateM3h = (16 * 60) / 1000; // adult light breathing (16 L/min)
+          const dose = h.pm25 * multiplier * breathingRateM3h * (durationMins / 60);
+          return {
+            hour: h.hour,
+            pm25: h.pm25,
+            dose,
+          };
+        })
+    : [];
+
+  const bestHour = hourlyWindows.length > 0
+    ? [...hourlyWindows].sort((a, b) => a.dose - b.dose)[0]
+    : null;
+
+  const worstHour = hourlyWindows.length > 0
+    ? [...hourlyWindows].sort((a, b) => b.dose - a.dose)[0]
+    : null;
+
+  const doseSaved = bestHour && worstHour ? Math.max(0, worstHour.dose - bestHour.dose) : 0;
+  const pctSaved = bestHour && worstHour && worstHour.dose > 0
+    ? Math.round((doseSaved / worstHour.dose) * 100)
+    : 0;
 
   if (loading) return <LoadingSpinner label="Loading commute alternatives..." />;
 
@@ -122,7 +153,113 @@ export const AlternativesView: React.FC = () => {
         </p>
       </section>
 
-      {/* 2. AI Lifestyle & Commute Swaps */}
+      {/* 2. Best Time to Travel: Diurnal Lowest-Exposure Window */}
+      {hourlyWindows.length > 0 && (
+        <section aria-labelledby="travel-window-heading" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xl" aria-hidden="true">⏱️</span>
+                <h2 id="travel-window-heading" className="text-lg font-bold">
+                  Best Time to Travel: Lowest-Exposure Commute Window
+                </h2>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                Calculated using hourly CAMS PM2.5 forecasts and EPA inhalation rates across diurnal temperature inversions.
+              </p>
+            </div>
+
+            {/* Travel Mode Selector */}
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs">
+              {(['metro', 'bus', 'two_wheeler', 'car', 'walk'] as TransportMode[]).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setSelectedTravelMode(m)}
+                  className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
+                    selectedTravelMode === m
+                      ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm font-bold'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+                  }`}
+                >
+                  <span aria-hidden="true" className="mr-1">{MODE_LABELS[m]?.icon}</span>
+                  <span className="capitalize">{m.replace('_', ' ')}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Actionable Comparison Callout */}
+          {bestHour && worstHour && (
+            <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-950/30 dark:to-blue-950/30 border border-emerald-200 dark:border-emerald-800/50 mb-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="space-y-1">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 text-xs font-bold">
+                    <span>💡</span> Lowest-Exposure Departure Recommendation
+                  </span>
+                  <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
+                    Departing at <strong className="text-emerald-700 dark:text-emerald-300 font-bold">{bestHour.hour}:00</strong> instead of peak smog at <strong className="text-rose-700 dark:text-rose-300 font-bold">{worstHour.hour}:00</strong> reduces inhaled PM2.5 by <strong className="text-emerald-700 dark:text-emerald-300 font-bold">{pctSaved}%</strong> ({doseSaved.toFixed(1)} µg saved) for the same {distanceKm} km trip.
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 text-xs">
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800 shadow-sm text-center">
+                    <span className="text-[10px] text-slate-400 uppercase font-semibold block">Best Window</span>
+                    <strong className="text-sm font-mono text-emerald-600 dark:text-emerald-400">{bestHour.hour}:00 - {(bestHour.hour + 1) % 24}:00</strong>
+                    <span className="block text-[11px] text-slate-500">{Math.round(bestHour.dose)} µg dose</span>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-rose-200 dark:border-rose-900/50 shadow-sm text-center">
+                    <span className="text-[10px] text-slate-400 uppercase font-semibold block">Peak Smog</span>
+                    <strong className="text-sm font-mono text-rose-600 dark:text-rose-400">{worstHour.hour}:00 - {(worstHour.hour + 1) % 24}:00</strong>
+                    <span className="block text-[11px] text-slate-500">{Math.round(worstHour.dose)} µg dose</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Hourly Timeline Grid */}
+          <div className="overflow-x-auto pb-2">
+            <div className="min-w-[580px] flex items-end gap-1.5 h-32 pt-4 px-2">
+              {hourlyWindows.map((w) => {
+                const isBest = bestHour && w.hour === bestHour.hour;
+                const isWorst = worstHour && w.hour === worstHour.hour;
+                const barHeight = Math.max(15, Math.min(100, (w.dose / (worstHour?.dose || 1)) * 100));
+
+                let barColor = 'bg-blue-400 dark:bg-blue-600';
+                if (isBest) barColor = 'bg-emerald-500 dark:bg-emerald-400';
+                else if (isWorst) barColor = 'bg-rose-500 dark:bg-rose-400';
+                else if (w.pm25 > 120) barColor = 'bg-amber-500 dark:bg-amber-600';
+
+                return (
+                  <div key={w.hour} className="flex-1 flex flex-col items-center justify-end h-full group relative">
+                    <div className="text-[10px] font-mono text-slate-400 mb-1">
+                      {Math.round(w.dose)}
+                    </div>
+                    <div
+                      style={{ height: `${barHeight}%` }}
+                      className={`w-full rounded-t-md transition-all ${barColor} group-hover:opacity-90`}
+                      title={`${w.hour}:00 • ${Math.round(w.pm25)} µg/m³ • ${w.dose.toFixed(1)} µg dose`}
+                    />
+                    <div className={`mt-2 text-[10px] font-mono ${isBest ? 'font-bold text-emerald-600 dark:text-emerald-400' : isWorst ? 'font-bold text-rose-600 dark:text-rose-400' : 'text-slate-500'}`}>
+                      {w.hour}h
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="sr-only">
+            {hourlyWindows.map((w) => (
+              <p key={w.hour}>
+                At {w.hour}:00, ambient PM2.5 is {w.pm25} micrograms per cubic meter, resulting in an estimated inhaled dose of {w.dose.toFixed(1)} micrograms for {selectedTravelMode}.
+              </p>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 3. AI Lifestyle & Commute Swaps */}
       {advice?.alternatives && (
         <section aria-labelledby="swaps-heading" className="space-y-4">
           <h2 id="swaps-heading" className="text-lg font-bold">

@@ -3,13 +3,15 @@ import { useApp } from '../../context/AppContext.js';
 import { ThemeToggle } from './ThemeToggle.js';
 import { LanguageSwitch } from './LanguageSwitch.js';
 import { apiService, type GeocodeLocation } from '../../services/apiService.js';
+import { PREDEFINED_PERSONAS } from '../../lib/personas.js';
 
 export const Header: React.FC<{ isMock?: boolean; isSimulation?: boolean }> = ({
   isMock = false,
   isSimulation = false,
 }) => {
-  const { location, setLocation, lang, clearAllData, exportData } = useApp();
+  const { location, setLocation, lang, clearAllData, exportData, household, setHousehold } = useApp();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [personaOpen, setPersonaOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<GeocodeLocation[]>([]);
   const [searching, setSearching] = useState(false);
@@ -72,49 +74,110 @@ export const Header: React.FC<{ isMock?: boolean; isSimulation?: boolean }> = ({
         </div>
 
         {/* Location selector */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setSearchOpen(!searchOpen)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm font-medium hover:border-blue-500 transition-colors"
-            aria-expanded={searchOpen}
-            aria-label={`Change city, currently ${location.name}`}
-          >
-            <span aria-hidden="true">📍</span>
-            <span>{location.name}, {location.country}</span>
-            <span aria-hidden="true" className="text-xs text-slate-400">▼</span>
-          </button>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setSearchOpen(!searchOpen);
+                setPersonaOpen(false);
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm font-medium hover:border-blue-500 transition-colors"
+              aria-expanded={searchOpen}
+              aria-label={`Change city, currently ${location.name}`}
+            >
+              <span aria-hidden="true">📍</span>
+              <span>{location.name}, {location.country}</span>
+              <span aria-hidden="true" className="text-xs text-slate-400">▼</span>
+            </button>
 
-          {searchOpen && (
-            <div className="absolute left-0 mt-2 w-72 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 p-2">
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => void handleSearch(e.target.value)}
-                placeholder="Search city (e.g. Delhi, London)..."
-                className="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-xs sm:text-sm mb-2 focus:outline-blue-500"
-                autoFocus
-              />
-              {searching && <p className="text-xs text-slate-500 p-2">Searching...</p>}
-              <ul className="max-h-48 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700 text-xs">
-                {results.map((c) => (
-                  <li key={c.id}>
-                    <button
-                      type="button"
-                      onClick={() => selectCity(c)}
-                      className="w-full text-left p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"
-                    >
-                      <strong className="block">{c.name}</strong>
-                      <span className="text-slate-500 text-[11px]">{c.admin1 ? `${c.admin1}, ` : ''}{c.country}</span>
-                    </button>
-                  </li>
-                ))}
-                {!searching && query.length >= 2 && results.length === 0 && (
-                  <li className="p-2 text-slate-500">No matching cities found</li>
-                )}
-              </ul>
-            </div>
-          )}
+            {searchOpen && (
+              <div className="absolute left-0 mt-2 w-72 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 p-2">
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => void handleSearch(e.target.value)}
+                  placeholder="Search city (e.g. Delhi, London)..."
+                  className="w-full px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-xs sm:text-sm mb-2 focus:outline-blue-500"
+                  autoFocus
+                />
+                {searching && <p className="text-xs text-slate-500 p-2">Searching...</p>}
+                <ul className="max-h-48 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700 text-xs">
+                  {results.map((c) => (
+                    <li key={c.id}>
+                      <button
+                        type="button"
+                        onClick={() => selectCity(c)}
+                        className="w-full text-left p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"
+                      >
+                        <strong className="block">{c.name}</strong>
+                        <span className="text-slate-500 text-[11px]">{c.admin1 ? `${c.admin1}, ` : ''}{c.country}</span>
+                      </button>
+                    </li>
+                  ))}
+                  {!searching && query.length >= 2 && results.length === 0 && (
+                    <li className="p-2 text-slate-500">No matching cities found</li>
+                  )}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          {/* Persona preset selector */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setPersonaOpen(!personaOpen);
+                setSearchOpen(false);
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm font-medium hover:border-blue-500 transition-colors"
+              aria-expanded={personaOpen}
+              aria-label={`Household persona, currently ${household.name}`}
+            >
+              <span aria-hidden="true">👤</span>
+              <span className="max-w-[140px] truncate">{household.name}</span>
+              <span aria-hidden="true" className="text-xs text-slate-400">▼</span>
+            </button>
+
+            {personaOpen && (
+              <div className="absolute right-0 sm:left-0 mt-2 w-80 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 p-2">
+                <div className="p-2 border-b border-slate-100 dark:border-slate-700 mb-1">
+                  <p className="font-bold text-xs text-slate-700 dark:text-slate-300">Choose Household Persona</p>
+                  <p className="text-[11px] text-slate-400">Tailors exposure math, room CADR and daily advice</p>
+                </div>
+                <ul className="max-h-60 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700 text-xs">
+                  {PREDEFINED_PERSONAS.map((p) => {
+                    const isSelected = household.name.includes(p.name);
+                    return (
+                      <li key={p.id}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setHousehold(p.profile);
+                            setPersonaOpen(false);
+                          }}
+                          className={`w-full text-left p-2.5 rounded-lg transition-colors hover:bg-blue-50 dark:hover:bg-slate-700 ${
+                            isSelected ? 'bg-blue-50/70 dark:bg-blue-950/40 font-semibold' : ''
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <strong className="text-slate-900 dark:text-slate-100">{p.name}</strong>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                              {p.role}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                            {p.vulnerabilityHighlight}
+                          </p>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Controls */}
