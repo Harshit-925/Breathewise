@@ -1,15 +1,14 @@
 # Breathewise — GenAI Urban Air Quality Assistant
 
 [![CI/CD](https://github.com/Harshit-925/Breathewise/actions/workflows/ci.yml/badge.svg)](https://github.com/Harshit-925/Breathewise/actions/workflows/ci.yml)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen)](https://harshit-925.github.io/Breathewise/)
-[![Tests](https://img.shields.io/badge/Tests-131%20passing-success)](https://github.com/Harshit-925/Breathewise)
-[![Bundle Size](https://img.shields.io/badge/Client%20Bundle-95.67%20kB%20gzip-informational)](https://github.com/Harshit-925/Breathewise)
+[![Deployment](https://img.shields.io/badge/Deployment-Vercel%20Full--Stack-black)](https://vercel.com)
+[![Tests](https://img.shields.io/badge/Tests-135%20passing-success)](https://github.com/Harshit-925/Breathewise)
+[![Bundle Size](https://img.shields.io/badge/Client%20Bundle-96.52%20kB%20gzip-informational)](https://github.com/Harshit-925/Breathewise)
 [![WCAG 2.2 AA](https://img.shields.io/badge/A11y-WCAG%202.2%20AA-blueviolet)](https://github.com/Harshit-925/Breathewise)
 [![Privacy](https://img.shields.io/badge/Privacy-Local--First%20(Zero%20PII)-blue)](https://github.com/Harshit-925/Breathewise)
 
 > A privacy-first, evidence-grounded urban environmental health platform designed to help families and communities navigate severe winter smog and urban air pollution. Powered by real-time CAMS atmospheric data, a pure deterministic mathematical engine, and defensive GenAI guidance.
 
-🔗 **Live Web Application**: [https://harshit-925.github.io/Breathewise/](https://harshit-925.github.io/Breathewise/)  
 📁 **Repository**: [https://github.com/Harshit-925/Breathewise](https://github.com/Harshit-925/Breathewise)
 
 ---
@@ -24,7 +23,7 @@ Every winter, millions of urban residents across the Indo-Gangetic Plain and glo
 - ⏱️ **Lowest-Exposure Travel & Commute Windows**: Evaluates 24-hour diurnal inversion forecasts and EPA inhalation rates to compute the exact "Best Time to Travel", allowing commuters to avoid up to 50% of inhaled PM2.5 on their daily trips without faking map networks.
 - 👤 **6 Real-World Predefined Personas**: Instant preset profiles for vulnerable demographics: asthmatic children, newborns, elderly relatives, school-run parents, daily commuters, and community leaders.
 - 🏠 **Multi-Tier Indoor Air Center**: Sized room CADR calculator, DIY Corsi-Rosenthal box fan instructions, and hour-by-hour solar ventilation window schedules.
-- 🚲 **Multimodal Transit Comparison**: Direct side-by-side trade-off matrix (metro, bus, car, EV, two-wheeler, cycle, walk) comparing inhaled particulate dose against CO2e emissions.
+- 🚲 **Multimodal Transit Comparison**: Direct side-by-side trade-off matrix (metro, bus, car, EV, two-wheeler, cycle, walk) comparing realistic trip travel times, exertion-adjusted breathing rates, inhaled particulate dose, and CO2e emissions.
 - 🔒 **Local-First Privacy Architecture**: Zero server sessions, zero tracking cookies, zero cloud databases. All household parameters and pledges stay inside the browser's `localStorage` with 1-click JSON export and 1-click data erasure.
 - 🛡️ **Defensive API Gateway**: Express gateway hardened with Helmet CSP, exact-origin CORS filtering, a strict 16KB body cap, dual-tier rate limiters, input sanitization, and CWE-209 error masking.
 - ♿ **WCAG 2.2 Level AA Accessibility**: Full keyboard roving tablist, skip-to-content landmark, non-color-exclusive indicators, and screen-reader twins (`.sr-only`) for every chart.
@@ -89,7 +88,7 @@ Breathewise implements pre-configured, evidence-based profiles selectable in the
 ## 2. Approach and Mathematical Logic
 
 ### Core Decisions & Trade-offs
-1. **LLM Does Language, Code Does Math**: Generative AI (Gemini 2.5 Flash) is strictly utilized for contextual advice phrasing, personalized tone, and conversational assistance. Every single numerical figure (AQI, WHO multiple, inhaled dose, required CADR, decay duration, CO2e delta) is calculated by a pure deterministic TypeScript engine (`src/lib/engine/`). Engine values overwrite model output prior to delivery.
+1. **LLM Does Language, Code Does Math**: Generative AI (Gemini 2.5 Flash) is strictly utilized for contextual advice phrasing, personalized tone, and conversational assistance. Every single numerical figure (AQI, WHO multiple, inhaled dose, required CADR, decay duration, CO2e delta) is calculated by a pure deterministic TypeScript engine (`src/lib/engine/`). Engine values strictly overwrite model output prior to delivery.
 2. **Local-First Privacy by Default**: No user accounts, passwords, or tracking databases. All household parameters, room dimensions, and pledge commitments remain inside the user's browser `localStorage`. A single-click "Clear My Data" wipes all storage, and a "JSON Export" enables full data portability.
 3. **Defensive API Gateway**: Express gateway hardened with Helmet CSP, exact-origin CORS filtering, a strict 16KB body limit, dual-tier rate limiting, and Zod strict schemas rejecting unknown properties.
 4. **Resilient Fallback**: If an API key is missing or quota is exhausted, a deterministic fallback generator synthesizes realistic structured guidance matching the exact JSON schema.
@@ -101,8 +100,8 @@ Breathewise implements pre-configured, evidence-based profiles selectable in the
 - **Inhaled Respiratory Dose**:
   $$\text{Dose} (\mu\text{g}) = C_{\text{PM2.5}} \times \text{Hours} \times \text{BreathingRate} \times (1 - \text{FilterEfficiency}) \times \text{IO\_Ratio}$$
 - **Clean Air Delivery Rate (CADR) & First-Order Exponential Decay**:
-  $$\text{CADR}_{\text{required}} = V_{\text{room}} \times \text{ACH}_{\text{target}}, \quad t = -\frac{V}{\text{CADR}} \ln(1 - \eta)$$
-- **Diurnal Stagnation Risk Heuristic**: Evaluates surface wind speeds ($< 2.5 \ \text{m/s}$) and boundary layer inversion indicators to classify smog trapping as Low, Medium, or High.
+  $$\text{CADR}_{\text{required}} = V_{\text{room}} \times \text{ACH}_{\text{target}}, \quad t_{90\%} = -\frac{V}{\text{CADR} \times \eta} \ln(0.10) \times 60$$
+- **Diurnal Stagnation Risk Heuristic**: Evaluates surface wind speeds ($< 2.0 \ \text{m/s}$) and boundary layer inversion indicators to classify smog trapping as Low, Medium, or High.
 
 ### Technology Stack Table
 
@@ -114,7 +113,7 @@ Breathewise implements pre-configured, evidence-based profiles selectable in the
 | **GenAI SDK** | Google Generative AI (Gemini 2.5 Flash / Flash-Lite) | @google/generative-ai 0.21 |
 | **Testing** | Vitest, Testing Library React, User-Event, Supertest, jsdom | Vitest 2.1, RTL 16.1, Supertest 7.0 |
 | **Code Quality** | Oxlint (`.oxlintrc.json`), TypeScript compiler (`tsc --noEmit`), Pre-commit | Oxlint 0.12, Pre-commit hooks |
-| **Deployment** | GitHub Pages (Client SPA), Vercel (`vercel.json`), GitHub Actions | CI/CD automated pipeline |
+| **Deployment** | Vercel (`vercel.json`), Express Serverless Function (`api/index.ts`), GitHub Actions | Full-stack production deployment |
 
 ---
 
@@ -125,9 +124,9 @@ Breathewise implements pre-configured, evidence-based profiles selectable in the
 2. **Routine Planner**: Suggests hour-by-hour windows indicating when to shift activities indoors and when solar warming provides safer ventilation intervals.
 3. **Indoor Air Center**: Provides 3 budget tiers (DIY Corsi-Rosenthal box fan, Standard certified HEPA, and Premium filtration), an interactive CADR calculator sized to room dimensions, and an hourly window open/close schedule.
 4. **Commute Alternatives & Lowest-Exposure Travel**:
-   - **Mode Comparison**: Multimodal table (metro, bus, car, EV, two-wheeler, cycle, walk) displaying exact inhaled PM2.5 and CO2e emissions for customizable trip distances.
+   - **Mode Comparison**: Multimodal table (metro, bus, car, EV, two-wheeler, cycle, walk) displaying realistic travel durations, physical exertion breathing rates, and exact inhaled PM2.5 and CO2e emissions for customizable trip distances.
    - **Best Time to Travel**: Uses hourly diurnal PM2.5 predictions and EPA inhalation equations to compute the lowest-exposure departure window, demonstrating how shifting travel by 1-2 hours avoids up to 50% of inhaled toxins.
-5. **Impact Meter**: Real-time toggles (N95 mask, HEPA purifier, WFH, transit) demonstrate direct mathematical reductions in inhaled dose and carbon emissions.
+5. **Impact Meter**: Real-time toggles (N95 mask, HEPA purifier, WFH, transit) demonstrate direct mathematical reductions in inhaled dose and carbon emissions with verified light-adult breathing rates (16 L/min).
 6. **Community Pledges**: Local-first collective counter tracking neighborhood commitments and aggregate avoided emissions.
 7. **Breathewise AI**: Streaming SSE assistant providing conversational guidance with context injection, quick-ask mode, prompt chips, and medical emergency guardrails.
 
@@ -152,7 +151,7 @@ npm run dev:server    # Starts Express API gateway (http://localhost:3001)
 # 5. Run Verification Checks
 npm run typecheck     # TypeScript strict compilation check
 npm run lint          # Oxlint static analysis
-npm test              # Run all 131 Vitest tests
+npm test              # Run all 135 Vitest tests
 npm run build         # Production Vite build
 npm run build:server  # Production server build
 ```
@@ -162,10 +161,10 @@ npm run build:server  # Production server build
 ## 4. Assumptions Made
 
 1. **Air Quality Data**: Live air quality is sourced from the Copernicus Atmosphere Monitoring Service (CAMS) ENSEMBLE model via Open-Meteo. Grid resolutions represent regional urban airshed values rather than specific curb-side hyper-local sensors.
-2. **Breathing Inhalation Rates**: Based on US EPA Exposure Factors Handbook (Rest: 0.45 m³/h, Light: 0.75 m³/h, Moderate: 1.20 m³/h, Heavy: 2.10 m³/h).
-3. **Mask Filtration**: Well-fitted N95/FFP2 respirators are modeled at 95% particle filtration efficiency; surgical masks at 40%; cloth masks at 15%.
-4. **Indoor Air Infiltration**: Baseline unpurified homes assume an indoor/outdoor PM2.5 ratio of 0.60 to 0.70 in typical construction. HEPA purifier use assumes an effective ratio of 0.20.
-5. **Transport Emissions**: Passenger vehicle emission rates use DEFRA 2024 benchmarks (~0.170 kg CO2e/km for petrol/diesel cars, ~0.035 kg CO2e/passenger-km for electric metro).
+2. **Breathing Inhalation Rates**: Based on US EPA Exposure Factors Handbook (Adult: Rest 0.45 m³/h / 7.5 L/min, Light 0.96 m³/h / 16 L/min, Moderate 1.80 m³/h / 30 L/min, Heavy 2.70 m³/h / 45 L/min).
+3. **Mask Filtration**: Well-fitted N95/FFP2 respirators are modeled at 95% particle filtration efficiency (NIOSH certified); surgical masks at 65% typical; cloth masks at 30% typical (empirical literature).
+4. **Indoor Air Infiltration**: Baseline unpurified homes assume an indoor/outdoor PM2.5 ratio of 0.50 (standard) to 0.80 (older leaky) based on Chen & Zhao (2011).
+5. **Transport Emissions & Physics**: Passenger vehicle emission rates use UK DEFRA 2024 and CPCB benchmarks (~0.170 kg CO2e/km for petrol/diesel cars, ~0.035 kg CO2e/passenger-km for electric metro). Modes model realistic urban speeds and physical exertion breathing rates.
 6. **Health Scope Limitation**: The assistant offers general environmental wellness suggestions and explicitly disclaims clinical medical diagnoses or treatment prescriptions.
 
 ---
@@ -201,18 +200,18 @@ Breathewise conforms to WCAG 2.2 Level AA accessibility guidelines:
 
 ## 7. Automated Test Results
 
-The test suite runs **131 tests across 8 test suites** with a **100% pass rate**:
+The test suite runs **135 tests across 8 test suites** with a **100% pass rate**:
 
 ```
 Test Files  8 passed (8)
-     Tests  131 passed (131)
+     Tests  135 passed (135)
 ```
 
 | Suite | File | Tests | Status |
 |---|---|---|---|
 | **Deterministic Engine** | `src/test/engine.test.ts` | 62 | ✅ Passed |
+| **AI Layer & Guardrails** | `src/test/ai.test.ts` | 18 | ✅ Passed |
 | **API Gateway & Routes** | `src/test/api.test.ts` | 15 | ✅ Passed |
-| **AI Layer & Guardrails** | `src/test/ai.test.ts` | 14 | ✅ Passed |
 | **Data Adapters** | `src/test/adapters.test.ts` | 12 | ✅ Passed |
 | **UI Rendering & A11y Twins** | `src/test/rendering.test.tsx` | 12 | ✅ Passed |
 | **DOM Events & Interactions** | `src/test/dom.test.tsx` | 10 | ✅ Passed |
@@ -229,12 +228,12 @@ Test Files  8 passed (8)
 
 | Category | Status | Evidence Document | Verification Command | Caveats / Notes |
 |---|---|---|---|---|
-| **Code Quality** | **Verified** | [`CODE_QUALITY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/CODE_QUALITY.md) | `npm run lint && npm run typecheck` | Zero `any` in TypeScript; oxlint passes with 0 warnings. Tooling configs: `.oxlintrc.json`, `.pre-commit-config.yaml`. |
+| **Code Quality** | **Verified** | [`CODE_QUALITY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/CODE_QUALITY.md) | `npm run lint && npm run typecheck` | Zero `any` in TypeScript; oxlint passes with 0 warnings on 75 files. Tooling configs: `.oxlintrc.json`, `.pre-commit-config.yaml`. |
 | **Security** | **Verified** | [`SECURITY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/SECURITY.md) | `npx vitest run src/test/api.test.ts` | Server-side key custody, Helmet CSP, exact CORS, 16KB body limit, OWASP Top 10 mapped, CWE-209 error masking. |
-| **Efficiency** | **Verified** | [`EFFICIENCY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/EFFICIENCY.md) | `npm run build` | Sub-100 kB JS gzip bundle (95.67 kB JS + 8.30 kB CSS); multi-tier LRU cache. |
-| **Testing** | **Verified** | [`TESTING.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/TESTING.md) | `npm test` | 131 tests passing across 8 suites (engine, API, AI, adapters, UI, DOM, a11y, journey). |
+| **Efficiency** | **Verified** | [`EFFICIENCY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/EFFICIENCY.md) | `npm run build` | Sub-100 kB JS gzip bundle (96.52 kB JS + 8.30 kB CSS); multi-tier LRU cache. |
+| **Testing** | **Verified** | [`TESTING.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/TESTING.md) | `npm test` | 135 tests passing across 8 suites (engine, API, AI, adapters, UI, DOM, a11y, journey). |
 | **Accessibility** | **Verified** | [`ACCESSIBILITY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/ACCESSIBILITY.md) | `npx vitest run src/test/a11y.test.tsx` | WCAG 2.2 AA compliant. Skip link, ARIA tablist, text twins for SVG charts. |
-| **Problem Alignment** | **Verified** | [`PROBLEM_ALIGNMENT.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/PROBLEM_ALIGNMENT.md) | `npx vitest run src/test/journey.test.tsx` | Full coverage of Challenge 6 winter smog navigation, 6 named personas, and diurnal commute exposure optimization. |
+| **Problem Alignment** | **Verified** | [`PROBLEM_ALIGNMENT.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/PROBLEM_ALIGNMENT.md) | `npx vitest run src/test/journey.test.tsx` | Full coverage of Challenge 6 winter smog navigation, 6 named personas, and diurnal commute exposure optimization. Empirical parameters (exposure multipliers, I/O ratios) explicitly marked as Partial / Empirical in standards appendix. |
 
 ---
 
@@ -242,10 +241,12 @@ Test Files  8 passed (8)
 
 ```
 Breathewise/
-├── .github/workflows/ci.yml        # Continuous integration pipeline
+├── .github/workflows/ci.yml        # Continuous integration pipeline (lint, typecheck, tests, gitleaks, audit)
 ├── .oxlintrc.json                  # Oxlint configuration
 ├── .pre-commit-config.yaml         # Pre-commit git hooks config
-├── vercel.json                     # Vercel deployment configuration
+├── vercel.json                     # Vercel deployment configuration (/api/(.*) -> serverless Express)
+├── api/
+│   └── index.ts                    # Vercel serverless function entrypoint
 ├── docs/                           # Architecture documentation & diagrams
 │   └── ARCHITECTURE.md             # System architecture & invariants
 ├── server/
@@ -274,7 +275,7 @@ Breathewise/
 │   │   └── constants.ts            # EPA breakpoints, WHO guidelines, CADR, breathing rates
 │   ├── services/                   # apiService.ts, storageService.ts
 │   ├── i18n/                       # en.json, hi.json
-│   ├── test/                       # 8 test suites (131 tests)
+│   ├── test/                       # 8 test suites (135 tests)
 │   ├── App.tsx                     # Main application shell
 │   ├── main.tsx                    # React 19 entry point
 │   ├── index.css                   # Tailwind v4 styles & accessibility focus rings

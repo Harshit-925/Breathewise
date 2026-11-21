@@ -12,7 +12,7 @@ async function generateMetadata() {
         status: 'Verified',
         evidence: 'CODE_QUALITY.md',
         verificationCommand: 'npm run lint && npm run typecheck',
-        notes: 'TypeScript strict mode with zero any, oxlint 100% clean on 72 files with .oxlintrc.json and .pre-commit-config.yaml.',
+        notes: 'TypeScript strict mode with zero any, oxlint 100% clean on 75 files with .oxlintrc.json and .pre-commit-config.yaml.',
       },
       security: {
         status: 'Verified',
@@ -24,13 +24,13 @@ async function generateMetadata() {
         status: 'Verified',
         evidence: 'EFFICIENCY.md',
         verificationCommand: 'npm run build',
-        notes: 'Client gzip bundle size 95.67 kB JS + 8.30 kB CSS. LRU cache for geocode, air quality, weather, and AI responses.',
+        notes: 'Client gzip bundle size 96.52 kB JS + 8.30 kB CSS. Multi-tier LRU cache for geocode, air quality, weather, and AI responses.',
       },
       testing: {
         status: 'Verified',
         evidence: 'TESTING.md',
         verificationCommand: 'npm test',
-        notes: '131 tests passing across 8 suites (engine, adapters, api, ai, rendering, dom, a11y, journey).',
+        notes: '135 tests passing across 8 suites (engine, adapters, api, ai, rendering, dom, a11y, journey). 100% pass rate.',
       },
       accessibility: {
         status: 'Verified',
@@ -42,18 +42,18 @@ async function generateMetadata() {
         status: 'Verified',
         evidence: 'PROBLEM_ALIGNMENT.md',
         verificationCommand: 'npx vitest run src/test/journey.test.tsx',
-        notes: 'Strict adherence to Challenge 6: low-emission routines, indoor air hacks (Corsi-Rosenthal & HEPA CADR), commute mode comparison.',
+        notes: 'Strict adherence to Challenge 6: low-emission routines, indoor air hacks (Corsi-Rosenthal & HEPA CADR), commute mode comparison with realistic physics, diurnal lowest-exposure commute window.',
       },
     },
     testMetrics: {
       totalSuites: 8,
-      totalTests: 131,
-      passed: 131,
+      totalTests: 135,
+      passed: 135,
       failed: 0,
       suites: {
         engine: 62,
         api: 15,
-        ai: 14,
+        ai: 18,
         rendering: 12,
         adapters: 12,
         dom: 10,
@@ -62,8 +62,8 @@ async function generateMetadata() {
       },
     },
     bundleMetrics: {
-      clientJsKb: 314.76,
-      clientJsGzipKb: 95.67,
+      clientJsKb: 317.47,
+      clientJsGzipKb: 96.52,
       clientCssKb: 45.07,
       clientCssGzipKb: 8.30,
       clientHtmlKb: 0.82,
@@ -75,6 +75,7 @@ async function generateMetadata() {
       ai: ['@google/generative-ai 0.21', 'Gemini 2.5 Flash', 'Gemini 2.5 Flash Lite'],
       test: ['Vitest 2.1', '@testing-library/react 16', '@testing-library/user-event 14', 'supertest 7', 'jsdom 25'],
       linter: ['Oxlint 0.12'],
+      deployment: ['Vercel Serverless (Express /api/index)', 'Vite Static Client'],
     },
   };
 

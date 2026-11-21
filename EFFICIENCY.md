@@ -20,10 +20,10 @@ Generated via `vite build`:
 
 | Asset | Raw Size | Gzip Size | Notes |
 |---|---|---|---|
-| `dist/assets/index.js` | 314.76 kB | **95.67 kB** | Includes React 19, Lucide-compatible icons, pure engine |
+| `dist/assets/index.js` | 317.47 kB | **96.52 kB** | Includes React 19, Lucide-compatible icons, pure engine |
 | `dist/assets/index.css` | 45.07 kB | **8.30 kB** | Optimized Tailwind CSS v4 styling |
 | `dist/index.html` | 0.82 kB | **0.48 kB** | Clean semantic HTML shell with SVG & ICO favicons |
-| **Total Client Bundle** | **360.65 kB** | **104.45 kB** | **Sub-100 kB JS transfer size with full client-side offline fallback** |
+| **Total Client Bundle** | **363.36 kB** | **105.30 kB** | **Sub-100 kB JS transfer size with full client-side offline fallback** |
 
 ---
 
@@ -42,7 +42,7 @@ Generated via `vite build`:
 
 | Claim | Evidence | Verification Command |
 |---|---|---|
-| **Sub-100 kB Gzip Bundle** | Production Vite bundle measured at 95.67 kB JS and 8.30 kB CSS gzip | `npm run build` |
+| **Sub-100 kB Gzip Bundle** | Production Vite bundle measured at 96.52 kB JS and 8.30 kB CSS gzip | `npm run build` |
 | **AI Response Caching** | SHA-256 hash caching prevents redundant Gemini API calls | `server/ai/cache.ts`, `src/test/ai.test.ts` |
 | **Zero Bloat Inline SVG** | Custom SVG charts without 500kB charting libraries | `src/components/shared/Sparkline.tsx` |
 | **Fast Build Times** | Full Vite client build completes in ~1.1 seconds | `npm run build` |
