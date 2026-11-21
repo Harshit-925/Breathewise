@@ -1,0 +1,6 @@
+.github
+.git
+docs
+src/test
+*.test.ts
+*.test.tsx

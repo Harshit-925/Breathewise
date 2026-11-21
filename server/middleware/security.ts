@@ -11,7 +11,7 @@ export function createSecurityMiddleware() {
   const corsMiddleware = cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps, curl, server-to-server)
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin) || isAllowedVercelOrigin(origin)) {
         callback(null, true);
       } else {
         callback(new Error('CORS origin denied'));
@@ -59,5 +59,18 @@ function sanitizeObject(obj: Record<string, unknown>): void {
     } else if (value && typeof value === 'object' && !Array.isArray(value)) {
       sanitizeObject(value as Record<string, unknown>);
     }
+  }
+}
+
+function isAllowedVercelOrigin(origin: string): boolean {
+  try {
+    const url = new URL(origin);
+    if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') return true;
+    if (url.hostname.endsWith('.vercel.app')) return true;
+    if (process.env['VERCEL_URL'] && (url.hostname === process.env['VERCEL_URL'] || url.host === process.env['VERCEL_URL'])) return true;
+    if (process.env['VERCEL_PROJECT_PRODUCTION_URL'] && (url.hostname === process.env['VERCEL_PROJECT_PRODUCTION_URL'] || url.host === process.env['VERCEL_PROJECT_PRODUCTION_URL'])) return true;
+    return false;
+  } catch {
+    return false;
   }
 }

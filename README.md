@@ -2,7 +2,7 @@
 
 [![CI/CD](https://github.com/Harshit-925/Breathewise/actions/workflows/ci.yml/badge.svg)](https://github.com/Harshit-925/Breathewise/actions/workflows/ci.yml)
 [![Deployment](https://img.shields.io/badge/Deployment-Vercel%20Full--Stack-black)](https://breathewise.vercel.app)
-[![Tests](https://img.shields.io/badge/Tests-136%20passing-success)](https://github.com/Harshit-925/Breathewise)
+[![Tests](https://img.shields.io/badge/Tests-139%20passing-success)](https://github.com/Harshit-925/Breathewise)
 [![Bundle Size](https://img.shields.io/badge/Client%20Bundle-97.42%20kB%20gzip-informational)](https://github.com/Harshit-925/Breathewise)
 [![WCAG 2.2 AA](https://img.shields.io/badge/A11y-WCAG%202.2%20AA-blueviolet)](https://github.com/Harshit-925/Breathewise)
 [![Privacy](https://img.shields.io/badge/Privacy-Local--First%20(Zero%20PII)-blue)](https://github.com/Harshit-925/Breathewise)
@@ -152,7 +152,7 @@ npm run dev:server    # Starts Express API gateway (http://localhost:3001)
 # 5. Run Verification Checks
 npm run typecheck     # TypeScript strict compilation check
 npm run lint          # Oxlint static analysis
-npm test              # Run all 136 Vitest tests
+npm test              # Run all 139 Vitest tests
 npm run build         # Production Vite build
 npm run build:server  # Production server build
 ```
@@ -201,18 +201,18 @@ Breathewise conforms to WCAG 2.2 Level AA accessibility guidelines:
 
 ## 7. Automated Test Results
 
-The test suite runs **136 tests across 8 test suites** with a **100% pass rate**:
+The test suite runs **139 tests across 8 test suites** with a **100% pass rate**:
 
 ```
 Test Files  8 passed (8)
-     Tests  136 passed (136)
+     Tests  139 passed (139)
 ```
 
 | Suite | File | Tests | Status |
 |---|---|---|---|
 | **Deterministic Engine** | `src/test/engine.test.ts` | 62 | ✅ Passed |
 | **AI Layer & Guardrails** | `src/test/ai.test.ts` | 19 | ✅ Passed |
-| **API Gateway & Routes** | `src/test/api.test.ts` | 15 | ✅ Passed |
+| **API Gateway & Routes** | `src/test/api.test.ts` | 18 | ✅ Passed |
 | **Data Adapters** | `src/test/adapters.test.ts` | 12 | ✅ Passed |
 | **UI Rendering & A11y Twins** | `src/test/rendering.test.tsx` | 12 | ✅ Passed |
 | **DOM Events & Interactions** | `src/test/dom.test.tsx` | 10 | ✅ Passed |
@@ -232,7 +232,7 @@ Test Files  8 passed (8)
 | **Code Quality** | **Verified** | [`CODE_QUALITY.md`](./CODE_QUALITY.md) | `npm run lint && npm run typecheck` | Zero `any` in TypeScript; oxlint passes with 0 warnings on 76 files. Tooling configs: `.oxlintrc.json`, `.pre-commit-config.yaml`. |
 | **Security** | **Verified** | [`SECURITY.md`](./SECURITY.md) | `npx vitest run src/test/api.test.ts` | Server-side key custody, Helmet CSP, exact CORS, 16KB body limit, OWASP Top 10 mapped, CWE-209 error masking. |
 | **Efficiency** | **Verified** | [`EFFICIENCY.md`](./EFFICIENCY.md) | `npm run build` | Sub-100 kB JS gzip bundle (97.42 kB JS + 8.42 kB CSS); multi-tier LRU cache. |
-| **Testing** | **Verified** | [`TESTING.md`](./TESTING.md) | `npm test` | 136 tests passing across 8 suites (engine, API, AI, adapters, UI, DOM, a11y, journey). |
+| **Testing** | **Verified** | [`TESTING.md`](./TESTING.md) | `npm test` | 139 tests passing across 8 suites (engine, API, AI, adapters, UI, DOM, a11y, journey). |
 | **Accessibility** | **Verified** | [`ACCESSIBILITY.md`](./ACCESSIBILITY.md) | `npx vitest run src/test/a11y.test.tsx` | WCAG 2.2 AA compliant. Skip link, ARIA tablist, text twins for SVG charts. |
 | **Problem Alignment** | **Verified** | [`PROBLEM_ALIGNMENT.md`](./PROBLEM_ALIGNMENT.md) | `npx vitest run src/test/journey.test.tsx` | Full coverage of Challenge 6 winter smog navigation, 6 named personas, and diurnal commute exposure optimization. Empirical parameters (exposure multipliers, I/O ratios) explicitly marked as Partial / Empirical in standards appendix. |
 
@@ -276,7 +276,7 @@ Breathewise/
 │   │   └── constants.ts            # EPA breakpoints, WHO guidelines, CADR, breathing rates
 │   ├── services/                   # apiService.ts, storageService.ts
 │   ├── i18n/                       # en.json, hi.json
-│   ├── test/                       # 8 test suites (136 tests)
+│   ├── test/                       # 8 test suites (139 tests)
 │   ├── App.tsx                     # Main application shell
 │   ├── main.tsx                    # React 19 entry point
 │   ├── index.css                   # Tailwind v4 styles & accessibility focus rings

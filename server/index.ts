@@ -24,6 +24,9 @@ export function createApp() {
   app.use(generalRateLimiter);
 
   // 4. API Routes
+  app.get(['/api', '/'], (_req, res) => {
+    res.json({ status: 'ok', name: 'Breathewise API Gateway', version: '0.1.0' });
+  });
   app.use('/api/health', healthRouter);
   app.use('/api/usage', usageRouter);
   app.use('/api/geocode', geocodeRouter);

@@ -10,6 +10,27 @@ describe('api routes suite', () => {
     process.env['ALLOWED_ORIGINS'] = 'http://localhost:5173,http://test.com';
   });
 
+  it('GET /api returns gateway info', async () => {
+    const res = await request(app).get('/api');
+    expect(res.status).toBe(200);
+    expect(res.body.name).toBe('Breathewise API Gateway');
+  });
+
+  it('permits requests from vercel.app domains via CORS', async () => {
+    const res = await request(app)
+      .get('/api/health')
+      .set('Origin', 'https://breathewise-preview.vercel.app');
+    expect(res.status).toBe(200);
+  });
+
+  it('rejects unauthorized foreign origins with CORS error', async () => {
+    const res = await request(app)
+      .get('/api/health')
+      .set('Origin', 'https://malicious-attacker.com');
+    expect(res.status).toBe(403);
+    expect(res.body.error).toBe('Origin not allowed');
+  });
+
   it('GET /api/health returns status, uptime and cache size', async () => {
     const res = await request(app).get('/api/health');
     expect(res.status).toBe(200);

@@ -30,7 +30,7 @@ async function generateMetadata() {
         status: 'Verified',
         evidence: 'TESTING.md',
         verificationCommand: 'npm test',
-        notes: '136 tests passing across 8 suites (engine, adapters, api, ai, rendering, dom, a11y, journey). 100% pass rate.',
+        notes: '139 tests passing across 8 suites (engine, adapters, api, ai, rendering, dom, a11y, journey). 100% pass rate.',
       },
       accessibility: {
         status: 'Verified',
@@ -47,12 +47,12 @@ async function generateMetadata() {
     },
     testMetrics: {
       totalSuites: 8,
-      totalTests: 136,
-      passed: 136,
+      totalTests: 139,
+      passed: 139,
       failed: 0,
       suites: {
         engine: 62,
-        api: 15,
+        api: 18,
         ai: 19,
         rendering: 12,
         adapters: 12,
