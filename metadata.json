@@ -2,25 +2,25 @@
   "name": "Breathewise",
   "workingTitle": "GenAI Urban Air Quality Assistant",
   "version": "0.1.0",
-  "generatedAt": "2026-11-20T17:54:20.743Z",
+  "generatedAt": "2026-11-21T17:37:42.070Z",
   "evaluationCategoryScorecards": {
     "codeQuality": {
       "status": "Verified",
       "evidence": "CODE_QUALITY.md",
       "verificationCommand": "npm run lint && npm run typecheck",
-      "notes": "TypeScript strict mode with zero any, oxlint 100% clean on 71 files, modular architecture with small modules."
+      "notes": "TypeScript strict mode with zero any, oxlint 100% clean on 72 files with .oxlintrc.json and .pre-commit-config.yaml."
     },
     "security": {
       "status": "Verified",
       "evidence": "SECURITY.md",
       "verificationCommand": "npx vitest run src/test/api.test.ts",
-      "notes": "Helmet strict CSP, CORS exact origin allowlist, body size capped to 100KB, IP rate limiting, input sanitization."
+      "notes": "Helmet strict CSP, CORS exact origin allowlist, body size capped to 16KB, IP rate limiting, input sanitization, OWASP Top 10 mapped, CWE-209 error masking."
     },
     "efficiency": {
       "status": "Verified",
       "evidence": "EFFICIENCY.md",
       "verificationCommand": "npm run build",
-      "notes": "Client gzip bundle size 86.52 kB JS + 7.79 kB CSS. LRU cache for geocode, air quality, weather, and AI responses."
+      "notes": "Client gzip bundle size 89.44 kB JS + 8.30 kB CSS. LRU cache for geocode, air quality, weather, and AI responses."
     },
     "testing": {
       "status": "Verified",
@@ -58,10 +58,10 @@
     }
   },
   "bundleMetrics": {
-    "clientJsKb": 287.03,
-    "clientJsGzipKb": 86.52,
-    "clientCssKb": 40.74,
-    "clientCssGzipKb": 7.79,
+    "clientJsKb": 298.54,
+    "clientJsGzipKb": 89.44,
+    "clientCssKb": 45.07,
+    "clientCssGzipKb": 8.3,
     "clientHtmlKb": 0.7,
     "clientHtmlGzipKb": 0.43
   },
@@ -80,8 +80,8 @@
     ],
     "ai": [
       "@google/generative-ai 0.21",
-      "Gemini 2.0 Flash",
-      "Gemini 2.0 Flash Lite"
+      "Gemini 2.5 Flash",
+      "Gemini 2.5 Flash Lite"
     ],
     "test": [
       "Vitest 2.1",
