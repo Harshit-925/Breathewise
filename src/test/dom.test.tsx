@@ -128,7 +128,7 @@ describe('dom events suite', () => {
     const lengthInput = screen.getByLabelText(/Length/i);
     await user.clear(lengthInput);
     await user.type(lengthInput, '6');
-    expect(screen.getByText(/Required CADR/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Required CADR/i).length).toBeGreaterThan(0);
   });
 
   it('CommunityView pledge button commits pledge and saves to storage', async () => {

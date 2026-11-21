@@ -2,7 +2,7 @@
   "name": "Breathewise",
   "workingTitle": "GenAI Urban Air Quality Assistant",
   "version": "0.1.0",
-  "generatedAt": "2026-11-21T17:37:42.070Z",
+  "generatedAt": "2026-11-21T18:00:46.538Z",
   "evaluationCategoryScorecards": {
     "codeQuality": {
       "status": "Verified",
@@ -20,7 +20,7 @@
       "status": "Verified",
       "evidence": "EFFICIENCY.md",
       "verificationCommand": "npm run build",
-      "notes": "Client gzip bundle size 89.44 kB JS + 8.30 kB CSS. LRU cache for geocode, air quality, weather, and AI responses."
+      "notes": "Client gzip bundle size 95.67 kB JS + 8.30 kB CSS. LRU cache for geocode, air quality, weather, and AI responses."
     },
     "testing": {
       "status": "Verified",
@@ -58,12 +58,12 @@
     }
   },
   "bundleMetrics": {
-    "clientJsKb": 298.54,
-    "clientJsGzipKb": 89.44,
+    "clientJsKb": 314.76,
+    "clientJsGzipKb": 95.67,
     "clientCssKb": 45.07,
     "clientCssGzipKb": 8.3,
-    "clientHtmlKb": 0.7,
-    "clientHtmlGzipKb": 0.43
+    "clientHtmlKb": 0.82,
+    "clientHtmlGzipKb": 0.48
   },
   "techStack": {
     "client": [

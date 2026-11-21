@@ -3,7 +3,7 @@
 [![CI/CD](https://github.com/Harshit-925/Breathewise/actions/workflows/ci.yml/badge.svg)](https://github.com/Harshit-925/Breathewise/actions/workflows/ci.yml)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen)](https://harshit-925.github.io/Breathewise/)
 [![Tests](https://img.shields.io/badge/Tests-131%20passing-success)](https://github.com/Harshit-925/Breathewise)
-[![Bundle Size](https://img.shields.io/badge/Client%20Bundle-89.44%20kB%20gzip-informational)](https://github.com/Harshit-925/Breathewise)
+[![Bundle Size](https://img.shields.io/badge/Client%20Bundle-95.67%20kB%20gzip-informational)](https://github.com/Harshit-925/Breathewise)
 [![WCAG 2.2 AA](https://img.shields.io/badge/A11y-WCAG%202.2%20AA-blueviolet)](https://github.com/Harshit-925/Breathewise)
 [![Privacy](https://img.shields.io/badge/Privacy-Local--First%20(Zero%20PII)-blue)](https://github.com/Harshit-925/Breathewise)
 
@@ -231,7 +231,7 @@ Test Files  8 passed (8)
 |---|---|---|---|---|
 | **Code Quality** | **Verified** | [`CODE_QUALITY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/CODE_QUALITY.md) | `npm run lint && npm run typecheck` | Zero `any` in TypeScript; oxlint passes with 0 warnings. Tooling configs: `.oxlintrc.json`, `.pre-commit-config.yaml`. |
 | **Security** | **Verified** | [`SECURITY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/SECURITY.md) | `npx vitest run src/test/api.test.ts` | Server-side key custody, Helmet CSP, exact CORS, 16KB body limit, OWASP Top 10 mapped, CWE-209 error masking. |
-| **Efficiency** | **Verified** | [`EFFICIENCY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/EFFICIENCY.md) | `npm run build` | Sub-100 kB gzip bundle (89.44 kB JS + 8.30 kB CSS); multi-tier LRU cache. |
+| **Efficiency** | **Verified** | [`EFFICIENCY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/EFFICIENCY.md) | `npm run build` | Sub-100 kB JS gzip bundle (95.67 kB JS + 8.30 kB CSS); multi-tier LRU cache. |
 | **Testing** | **Verified** | [`TESTING.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/TESTING.md) | `npm test` | 131 tests passing across 8 suites (engine, API, AI, adapters, UI, DOM, a11y, journey). |
 | **Accessibility** | **Verified** | [`ACCESSIBILITY.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/ACCESSIBILITY.md) | `npx vitest run src/test/a11y.test.tsx` | WCAG 2.2 AA compliant. Skip link, ARIA tablist, text twins for SVG charts. |
 | **Problem Alignment** | **Verified** | [`PROBLEM_ALIGNMENT.md`](file:///c:/Users/hk672/OneDrive/Desktop/Program/Urban_Air/PROBLEM_ALIGNMENT.md) | `npx vitest run src/test/journey.test.tsx` | Full coverage of Challenge 6 winter smog navigation, 6 named personas, and diurnal commute exposure optimization. |

@@ -1,5 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import type { ChatMessage, AirData } from '../types/index.js';
+import { isStaticHost } from '../services/apiService.js';
+import { generateClientChatReply } from '../lib/clientChat.js';
 
 export function useChat(airData: AirData | null) {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -38,6 +40,25 @@ export function useChat(airData: AirData | null) {
       setMessages([...updatedHistory, assistantMsg]);
 
       try {
+        if (isStaticHost()) {
+          // Stream client-generated response smoothly
+          const reply = generateClientChatReply(userText, airData);
+          let assistantContent = '';
+          for (let i = 0; i < reply.length; i += 4) {
+            assistantContent += reply.slice(i, i + 4);
+            setMessages((prev) => {
+              const next = [...prev];
+              const last = next[next.length - 1];
+              if (last && last.role === 'assistant') {
+                next[next.length - 1] = { ...last, content: assistantContent };
+              }
+              return next;
+            });
+            await new Promise((r) => setTimeout(r, 20));
+          }
+          return;
+        }
+
         abortControllerRef.current = new AbortController();
         const res = await fetch('/api/chat', {
           method: 'POST',
@@ -50,7 +71,17 @@ export function useChat(airData: AirData | null) {
         });
 
         if (!res.ok) {
-          throw new Error(`Chat error ${res.status}`);
+          // If server returned error/404, fall back to client reply rather than throwing broken error
+          const reply = generateClientChatReply(userText, airData);
+          setMessages((prev) => {
+            const next = [...prev];
+            const last = next[next.length - 1];
+            if (last && last.role === 'assistant') {
+              next[next.length - 1] = { ...last, content: reply };
+            }
+            return next;
+          });
+          return;
         }
 
         const reader = res.body?.getReader();

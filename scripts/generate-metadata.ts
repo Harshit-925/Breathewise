@@ -24,7 +24,7 @@ async function generateMetadata() {
         status: 'Verified',
         evidence: 'EFFICIENCY.md',
         verificationCommand: 'npm run build',
-        notes: 'Client gzip bundle size 89.44 kB JS + 8.30 kB CSS. LRU cache for geocode, air quality, weather, and AI responses.',
+        notes: 'Client gzip bundle size 95.67 kB JS + 8.30 kB CSS. LRU cache for geocode, air quality, weather, and AI responses.',
       },
       testing: {
         status: 'Verified',
@@ -62,12 +62,12 @@ async function generateMetadata() {
       },
     },
     bundleMetrics: {
-      clientJsKb: 298.54,
-      clientJsGzipKb: 89.44,
+      clientJsKb: 314.76,
+      clientJsGzipKb: 95.67,
       clientCssKb: 45.07,
       clientCssGzipKb: 8.30,
-      clientHtmlKb: 0.7,
-      clientHtmlGzipKb: 0.43,
+      clientHtmlKb: 0.82,
+      clientHtmlGzipKb: 0.48,
     },
     techStack: {
       client: ['React 19', 'TypeScript 5.6', 'Vite 6', 'Tailwind CSS v4'],
