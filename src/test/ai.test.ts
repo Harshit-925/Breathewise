@@ -11,7 +11,7 @@ import { generateFallbackAdvice } from '../../server/ai/fallback.js';
 import { generateAdviceWithGemini, overwriteWithDeterministicEngine } from '../../server/ai/gemini.js';
 import { StructuredAdviceSchema } from '../../server/schemas/index.js';
 import { cadrRequired, purificationTime } from '../../src/lib/engine/cadr.js';
-import type { HouseholdProfile, AirData } from '../../src/types/index.js';
+import type { HouseholdProfile, AirData, StructuredAdvice } from '../../src/types/index.js';
 
 describe('ai layer suite', () => {
   const sampleHousehold: HouseholdProfile = {
@@ -138,11 +138,58 @@ describe('ai layer suite', () => {
     expect(cleanTimes[0]!).toBeLessThan(cleanTimes[1]!);
     expect(cleanTimes[1]!).toBeLessThan(cleanTimes[2]!);
 
-    // Expected DIY physical values for CADR = 350 m³/h, eff = 0.90, target = 0.90:
-    // 20 m³: ~9 min, 45 m³: ~20 min, 120 m³: ~53 min
-    expect(cleanTimes[0]).toBe(Math.round(purificationTime(20, 350, 0.90, 0, 0.90).minutes));
-    expect(cleanTimes[1]).toBe(Math.round(purificationTime(45, 350, 0.90, 0, 0.90).minutes));
-    expect(cleanTimes[2]).toBe(Math.round(purificationTime(120, 350, 0.90, 0, 0.90).minutes));
+    // Expected DIY physical values for CADR = 350 m³/h, eff = 1.0 (ANSI/AHAM standard), target = 0.90:
+    // 20 m³: ~8 min, 45 m³: ~18 min, 120 m³: ~47 min
+    expect(cleanTimes[0]).toBe(Math.round(purificationTime(20, 350, 1.0, 0, 0.90).minutes));
+    expect(cleanTimes[1]).toBe(Math.round(purificationTime(45, 350, 1.0, 0, 0.90).minutes));
+    expect(cleanTimes[2]).toBe(Math.round(purificationTime(120, 350, 1.0, 0, 0.90).minutes));
+  });
+
+  it('overwriteWithDeterministicEngine matches alternatives by from/to modes and overwrites why & routine', () => {
+    const customAdvice: StructuredAdvice = {
+      ...generateFallbackAdvice(sampleHousehold, sampleAirData, 'en'),
+      verdict: {
+        level: 'unhealthy',
+        headline: 'Smog alert',
+        why: 'LLM generated hallucinatory explanation here',
+      },
+      routine: [
+        {
+          window: '06:00 - 08:30',
+          activity: 'Morning workout',
+          reason: 'Inversion',
+          impact: 'LLM says 99% less dose',
+        },
+      ],
+      alternatives: [
+        {
+          from: 'Bicycle ride on highway',
+          to: 'Electric Metro rail',
+          effort: 'Medium',
+          exposureDelta: 9999, // LLM hallucinated number
+          co2eDelta: 9999, // LLM hallucinated number
+          assumptions: ['Hallucinated'],
+        },
+      ],
+    };
+
+    const overwritten = overwriteWithDeterministicEngine(customAdvice, sampleHousehold, sampleAirData);
+
+    // 1. verdict.why is overwritten deterministically
+    expect(overwritten.verdict.why).toContain('Ambient PM2.5 is 180 µg/m³');
+    expect(overwritten.verdict.why).toContain('WHO 24-hour guideline');
+
+    // 2. routine impact is overwritten deterministically
+    expect(overwritten.routine[0]?.impact).not.toContain('LLM says 99% less dose');
+    expect(overwritten.routine[0]?.impact).toContain('inversion exposure');
+
+    // 3. alternatives are matched by mode (cycle -> metro) not position
+    expect(overwritten.alternatives[0]!.from).toBe('Bicycle ride on highway');
+    expect(overwritten.alternatives[0]!.to).toBe('Electric Metro rail');
+    expect(overwritten.alternatives[0]!.exposureDelta).not.toBe(9999);
+    expect(overwritten.alternatives[0]!.co2eDelta).not.toBe(9999);
+    // Cycle to Metro should reduce exposure
+    expect(overwritten.alternatives[0]!.exposureDelta).toBeLessThan(0);
   });
 
   it('overwriteWithDeterministicEngine overwrites all indoor tiers and all alternatives', () => {

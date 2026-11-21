@@ -24,20 +24,27 @@ export function cadrRequired(
 
 /**
  * Estimate minutes to reach target PM2.5 reduction.
- * Uses exponential decay: t = −V / (CADR × η − naturalLoss) × ln(1 − target_fraction) × 60.
- * Default targetFraction = 0.632 (one e-fold / 63% reduction).
- * Pass targetFraction = 0.90 for 90% clearance.
+ * Standard exponential single-zone decay:
+ * t = −V / (CADR × η − naturalLoss) × ln(1 − target_fraction) × 60.
+ *
+ * NOTE: Per ANSI/AHAM AC-1 and US EPA, CADR by definition already incorporates
+ * the filter's single-pass efficiency (CADR = Q × η). Therefore, default efficiency
+ * is 1.0 to avoid double-counting filtration efficiency.
+ *
+ * Default targetFraction = 0.632 (one e-fold / 63.2% clearance).
+ * Pass targetFraction = 0.90 for 90% particle clearance time.
  */
 export function purificationTime(
   volume: number,
   cadr: number,
-  efficiency: number = 0.95,
+  efficiency: number = 1.0,
   naturalLoss: number = 0,
   targetFraction: number = 0.632,
 ): PurificationTimeResult {
   const isOneEFold = Math.abs(targetFraction - 0.632) < 0.01;
   const assumptions: string[] = [
     'Assumes well-mixed room (single-zone model)',
+    'CADR already incorporates filter efficiency (ANSI/AHAM AC-1)',
     isOneEFold
       ? 'Returns time for one e-fold (63 % PM2.5 reduction)'
       : `Returns time for ${(targetFraction * 100).toFixed(0)} % PM2.5 reduction`,

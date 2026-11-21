@@ -1,37 +1,7 @@
-import type { HouseholdProfile, AirData } from '../../src/types/index.js';
-import { aqiCategory } from '../../src/lib/engine/aqi.js';
+import type { HouseholdProfile, AirData, StructuredAdvice } from '../../src/types/index.js';
+import { aqiCategory, whoMultiple } from '../../src/lib/engine/aqi.js';
 import { cadrRequired, purificationTime } from '../../src/lib/engine/cadr.js';
-
-export interface StructuredAdvice {
-  readonly verdict: {
-    readonly level: 'good' | 'moderate' | 'unhealthy' | 'hazardous';
-    readonly headline: string;
-    readonly why: string;
-  };
-  readonly routine: Array<{
-    readonly window: string;
-    readonly activity: string;
-    readonly reason: string;
-    readonly impact: string;
-  }>;
-  readonly indoor: Array<{
-    readonly tier: 'diy' | 'standard' | 'premium';
-    readonly title: string;
-    readonly steps: string[];
-    readonly costBand: string;
-    readonly effect: string;
-    readonly assumptions: string[];
-  }>;
-  readonly alternatives: Array<{
-    readonly from: string;
-    readonly to: string;
-    readonly effort: string;
-    readonly exposureDelta: number;
-    readonly co2eDelta: number;
-    readonly assumptions: string[];
-  }>;
-  readonly disclaimer: string;
-}
+import { compareModes } from '../../src/lib/engine/modes.js';
 
 export function generateFallbackAdvice(
   household: HouseholdProfile,
@@ -40,6 +10,7 @@ export function generateFallbackAdvice(
 ): StructuredAdvice {
   const aqi = airData.aqi;
   const cat = aqiCategory(aqi, 'epa');
+  const who = whoMultiple(airData.pm25);
 
   let verdictLevel: 'good' | 'moderate' | 'unhealthy' | 'hazardous' = 'moderate';
   if (aqi <= 50) verdictLevel = 'good';
@@ -47,40 +18,54 @@ export function generateFallbackAdvice(
   else if (aqi <= 200) verdictLevel = 'unhealthy';
   else verdictLevel = 'hazardous';
 
-  const DIY_CADR = 350;
-  const diyPurifyMins = Math.round(purificationTime(household.roomVolume, DIY_CADR, 0.90, 0, 0.90).minutes);
+  const DIY_CADR = 350; // m³/h Corsi-Rosenthal box cleaner
+  const diyPurifyMins = Math.round(purificationTime(household.roomVolume, DIY_CADR, 1.0, 0, 0.90).minutes);
 
   const cadrReq = cadrRequired(household.roomVolume, 4).cadrM3h;
-  const stdPurifyMins = Math.round(purificationTime(household.roomVolume, cadrReq, 0.95, 0, 0.90).minutes);
+  const stdPurifyMins = Math.round(purificationTime(household.roomVolume, cadrReq, 1.0, 0, 0.90).minutes);
 
   const premCadrReq = cadrRequired(household.roomVolume, 6).cadrM3h;
-  const premPurifyMins = Math.round(purificationTime(household.roomVolume, premCadrReq, 0.99, 0, 0.90).minutes);
+  const premPurifyMins = Math.round(purificationTime(household.roomVolume, premCadrReq, 1.0, 0, 0.90).minutes);
+
+  const comp = compareModes({ distanceKm: 10, durationMinutes: 30 }, airData.pm25, ['car', 'metro', 'bus', 'two_wheeler']);
+  const metroRes = comp.results.find((r) => r.mode === 'metro');
+  const carRes = comp.results.find((r) => r.mode === 'car');
+  const busRes = comp.results.find((r) => r.mode === 'bus');
+  const twRes = comp.results.find((r) => r.mode === 'two_wheeler');
+
+  const expDelta0 = metroRes && carRes ? Math.round(metroRes.inhaledPm25Ug - carRes.inhaledPm25Ug) : -28;
+  const co2Delta0 = metroRes && carRes ? Number((metroRes.co2eKg - carRes.co2eKg).toFixed(2)) : -1.35;
+
+  const expDelta1 = busRes && twRes ? Math.round(busRes.inhaledPm25Ug - twRes.inhaledPm25Ug) : -35;
+  const co2Delta1 = busRes && twRes ? Number((busRes.co2eKg - twRes.co2eKg).toFixed(2)) : 0.29;
 
   if (lang === 'hi') {
     return {
+      isOffline: true,
+      source: 'offline_heuristic',
       verdict: {
         level: verdictLevel,
         headline: `वर्तमान वायु गुणवत्ता ${cat.label} (AQI ${aqi}) है`,
-        why: `PM2.5 का स्तर ${airData.pm25} µg/m³ है, जो विश्व स्वास्थ्य संगठन के दिशानिर्देशों से अधिक है।`,
+        why: `PM2.5 का स्तर ${airData.pm25} µg/m³ है, जो विश्व स्वास्थ्य संगठन के 24-घंटे मानक (15 µg/m³) से ${who.multiple.toFixed(1)} गुना अधिक है।`,
       },
       routine: [
         {
-          window: '06:00 - 08:00',
+          window: '06:00 - 08:30',
           activity: 'सुबह की बाहरी सैर से बचें या घर के अंदर योग/व्यायाम करें',
           reason: 'सुबह की ठंडी हवा में प्रदूषण जमीन के पास जम जाता है (थर्मल इनवर्जन)।',
-          impact: 'सांस में जाने वाले PM2.5 में 40% तक की कमी।',
+          impact: 'दोपहर की तुलना में सुबह के चरम प्रदूषण से बचाव।',
         },
         {
-          window: '12:00 - 15:00',
-          activity: 'यदि आवश्यक हो तो जरूरी बाहरी काम इस समय निपटाएं',
-          reason: 'दोपहर में धूप और हवा के कारण प्रदूषण का स्तर अपेक्षाकृत कम रहता है।',
-          impact: 'कम से कम जोखिम में कार्य संपादन।',
+          window: '12:00 - 15:30',
+          activity: 'यदि आवश्यक हो तो जरूरी बाहरी काम इस समय निपटाएं (N95 मास्क पहनें)',
+          reason: 'दोपहर में सौर विकिरण और हवा के कारण प्रदूषण का स्तर दिन में सबसे कम रहता है।',
+          impact: 'दिन का सबसे कम जोखिम वाला समय।',
         },
         {
           window: '19:00 - 22:00',
           activity: 'खिड़कियां बंद रखें और एयर प्यूरीफायर चालू रखें',
-          reason: 'शाम के ट्रैफिक और तापमान में गिरावट से प्रदूषण फिर बढ़ता है।',
-          impact: 'रात में स्वच्छ नींद और श्वसन तंत्र की सुरक्षा।',
+          reason: 'शाम के ट्रैफिक और गिरते तापमान से प्रदूषण फिर बढ़ता है।',
+          impact: 'रात में स्वच्छ नींद और श्वसन तंत्र की 90% सुरक्षा।',
         },
       ],
       indoor: [
@@ -93,7 +78,7 @@ export function generateFallbackAdvice(
             'कमरे में निरंतर मध्यम गति पर चलाएं।',
           ],
           costBand: '₹1,500 - ₹2,500',
-          effect: `कमरे के वायु को लगभग ${diyPurifyMins} मिनट में 90% शुद्ध करता है।`,
+          effect: `कमरे (${household.roomVolume} m³) के वायु को लगभग ${diyPurifyMins} मिनट में 90% शुद्ध करता है।`,
           assumptions: [`कमरे का आयतन: ${household.roomVolume} m³`, 'CADR ~350 m³/h', '90% कण निष्कासन समय'],
         },
         {
@@ -105,7 +90,7 @@ export function generateFallbackAdvice(
             'दरवाजे और खिड़कियां बंद रखें।',
           ],
           costBand: '₹7,000 - ₹12,000',
-          effect: `99.97% महीन कणों को फिल्टर करता है (90% शुद्धिकरण ~${stdPurifyMins} मिनट)।`,
+          effect: `Certified HEPA rated for ${cadrReq} m³/h CADR (90% शुद्धिकरण ~${stdPurifyMins} मिनट)।`,
           assumptions: [`आवश्यक CADR: ${cadrReq} m³/h`, `${household.roomVolume} m³ के लिए 4 ACH`],
         },
         {
@@ -117,7 +102,7 @@ export function generateFallbackAdvice(
             'CO2 स्तर की निगरानी करें और दोपहर में नियंत्रित वेंटिलेशन करें।',
           ],
           costBand: '₹20,000+',
-          effect: `PM2.5, VOCs और गंध का संपूर्ण नियंत्रण (90% शुद्धिकरण ~${premPurifyMins} मिनट)।`,
+          effect: `Hospital-grade HEPA + Carbon (${premCadrReq} m³/h CADR, 90% शुद्धिकरण ~${premPurifyMins} मिनट)।`,
           assumptions: [`आवश्यक CADR: ${premCadrReq} m³/h`, 'स्मार्ट सेंसर स्वचालित गति नियंत्रण'],
         },
       ],
@@ -126,16 +111,16 @@ export function generateFallbackAdvice(
           from: 'अकेले कार से यात्रा (10 किमी)',
           to: 'मेट्रो या रैपिड रेल',
           effort: 'मध्यम',
-          exposureDelta: -35,
-          co2eDelta: -1.35,
+          exposureDelta: expDelta0,
+          co2eDelta: co2Delta0,
           assumptions: ['10 किमी यात्रा दूरी', 'DEFRA कार्बन उत्सर्जन मानक'],
         },
         {
           from: 'दोपहिया वाहन यात्रा',
           to: 'सार्वजनिक बस या मेट्रो',
           effort: 'मध्यम',
-          exposureDelta: -45,
-          co2eDelta: 0.29,
+          exposureDelta: expDelta1,
+          co2eDelta: co2Delta1,
           assumptions: ['10 किमी शहरी यात्रा', 'सड़क पर सीधा धुआं संपर्क कटौती'],
         },
       ],
@@ -145,17 +130,19 @@ export function generateFallbackAdvice(
 
   // English fallback
   return {
+    isOffline: true,
+    source: 'offline_heuristic',
     verdict: {
       level: verdictLevel,
       headline: `Current Air Quality is ${cat.label} (AQI ${aqi})`,
-      why: `PM2.5 concentration is ${airData.pm25} µg/m³, which warrants targeted protective measures for sensitive individuals.`,
+      why: `Ambient PM2.5 is ${airData.pm25} µg/m³ (${who.multiple.toFixed(1)}× the WHO 24-hour guideline of 15 µg/m³). Inversion trapping requires indoor mitigation and exposure reductions.`,
     },
     routine: [
       {
         window: '06:00 - 08:30',
         activity: 'Move workouts indoors; delay early outdoor runs or school walks',
         reason: 'Ground-level temperature inversions trap vehicular and particulate smog early morning.',
-        impact: 'Reduces morning PM2.5 inhaled dose by an estimated 45%.',
+        impact: 'Avoids ~40-50% higher peak inversion exposure compared to midday transit.',
       },
       {
         window: '12:00 - 15:30',
@@ -213,21 +200,23 @@ export function generateFallbackAdvice(
         from: 'Solo Petrol/Diesel Car Commute (10 km)',
         to: 'Metro Transit + First/Last-Mile Walk with N95 Mask',
         effort: 'Low-Medium',
-        exposureDelta: -28,
-        co2eDelta: -1.35,
+        exposureDelta: expDelta0,
+        co2eDelta: co2Delta0,
         assumptions: [
           '10 km daily commute baseline',
-          'Cabin filter assumption: moderate leakage in congested traffic',
-          'DEFRA UK & CPCB transport emissions factors',
+          'Calculated via deterministic Breathewise transport engine',
         ],
       },
       {
         from: 'Motorbike / Open Two-Wheeler Commute',
         to: 'Air-Conditioned Public Bus or Metro',
         effort: 'Medium',
-        exposureDelta: -35,
-        co2eDelta: 0.29,
-        assumptions: ['Direct exhaust plume exposure on two-wheelers is 2-3x ambient background'],
+        exposureDelta: expDelta1,
+        co2eDelta: co2Delta1,
+        assumptions: [
+          '10 km urban corridor trip',
+          'Calculated via deterministic Breathewise transport engine',
+        ],
       },
     ],
     disclaimer:

@@ -17,7 +17,7 @@ export const IndoorView: React.FC = () => {
 
   const roomVol = Math.round(length * width * height);
   const cadrCalc = cadrRequired(roomVol, targetAch);
-  const purifyMins = Math.round(purificationTime(roomVol, cadrCalc.cadrM3h, 0.9, 0, 0.90).minutes);
+  const purifyMins = Math.round(purificationTime(roomVol, cadrCalc.cadrM3h, 1.0, 0, 0.90).minutes);
 
   const winSchedule = airData ? windowSchedule(airData.hourly) : null;
 
