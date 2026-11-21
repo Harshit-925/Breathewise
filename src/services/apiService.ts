@@ -1,10 +1,8 @@
-import type { AirData, HourlyData, HouseholdProfile, StagnationResult, WhoMultipleResult, BestWindowsResult } from '../types/index.js';
-import type { StructuredAdvice } from '../../server/ai/fallback.js';
-import { generateFallbackAdvice } from '../../server/ai/fallback.js';
+import type { AirData, HourlyData, HouseholdProfile, StagnationResult, WhoMultipleResult, BestWindowsResult, StructuredAdvice } from '../types/index.js';
+import { generateClientFallbackAdvice, checkClientEmergency, checkClientOffTopic, CLIENT_EMERGENCY_REDIRECT_MESSAGE, CLIENT_OFF_TOPIC_REDIRECT_MESSAGE } from '../lib/clientFallback.js';
 import { pm25ToAqi, whoMultiple } from '../lib/engine/aqi.js';
 import { stagnationRisk } from '../lib/engine/stagnation.js';
 import { bestOutdoorWindows } from '../lib/engine/exposure.js';
-import { checkEmergencySymptoms, checkOffTopic, EMERGENCY_REDIRECT_MESSAGE, OFF_TOPIC_REDIRECT_MESSAGE } from '../../server/ai/guardrails.js';
 
 export interface AirApiResponse {
   airData: AirData;
@@ -183,18 +181,22 @@ async function searchGeocodeClientSide(query: string): Promise<GeocodeLocation[]
   }
 }
 
-export function generateLiteAnswer(question: string, aqi = 120): string {
+export function generateLiteAnswer(question: string, rawAqi?: number, rawPm25?: number): string {
+  const pm25 = rawPm25 ?? 75;
+  const aqi = rawAqi ?? pm25ToAqi(pm25).aqi;
   const lower = question.toLowerCase();
+  const offlinePrefix = '[Offline Rule-Based Answer] ';
+
   if (lower.includes('mask') || lower.includes('n95')) {
-    return 'Wear an N95 or FFP2 respirator outdoors; cloth masks provide negligible filtration against hazardous fine PM2.5.';
+    return `${offlinePrefix}At current AQI ${aqi} (PM2.5: ${pm25} µg/m³), wear a certified N95 or FFP2 respirator outdoors; cloth masks provide negligible filtration against hazardous fine PM2.5.`;
   }
   if (lower.includes('window') || lower.includes('ventilat')) {
-    return 'Keep windows closed during early morning and late evening smog peaks; open only briefly around 13:00-15:00 if fresh air is needed.';
+    return `${offlinePrefix}Keep windows closed during early morning and late evening smog peaks; open only briefly around 12:30–15:00 if fresh air is needed.`;
   }
   if (lower.includes('purifier') || lower.includes('cadr')) {
-    return 'Aim for 4 to 5 Air Changes per Hour (ACH). Use our Indoor Center to calculate required CADR for your room dimensions or build a DIY box fan filter.';
+    return `${offlinePrefix}Aim for 4 to 5 Air Changes per Hour (ACH). Use our Indoor Center to calculate required CADR for your room dimensions or build a DIY box fan filter.`;
   }
-  return `With AQI around ${aqi}, limit prolonged outdoor exertion and run HEPA air filtration in sleeping areas.`;
+  return `${offlinePrefix}With current AQI around ${aqi} (PM2.5 ${pm25} µg/m³), limit prolonged outdoor exertion and run HEPA air filtration in sleeping areas.`;
 }
 
 export const apiService = {
@@ -238,7 +240,7 @@ export const apiService = {
 
   async getAdvice(household: HouseholdProfile, airData: AirData, lang: 'en' | 'hi'): Promise<StructuredAdvice> {
     if (isStaticHost()) {
-      return generateFallbackAdvice(household, airData, lang);
+      return generateClientFallbackAdvice(household, airData, lang);
     }
 
     try {
@@ -248,29 +250,30 @@ export const apiService = {
         body: JSON.stringify({ household, airData, lang }),
       });
       if (res.ok) {
-        return (await res.json()) as StructuredAdvice;
+        const data = (await res.json()) as StructuredAdvice;
+        return { ...data, isOffline: false };
       }
     } catch {
       // Gateway unreachable
     }
 
-    return generateFallbackAdvice(household, airData, lang);
+    return generateClientFallbackAdvice(household, airData, lang);
   },
 
   async askQuick(
     question: string,
     airData?: AirData,
     _lang: 'en' | 'hi' = 'en'
-  ): Promise<{ answer: string; isEmergency?: boolean; isOffTopic?: boolean }> {
-    if (checkEmergencySymptoms(question)) {
-      return { answer: EMERGENCY_REDIRECT_MESSAGE, isEmergency: true };
+  ): Promise<{ answer: string; isEmergency?: boolean; isOffTopic?: boolean; isOffline?: boolean }> {
+    if (checkClientEmergency(question)) {
+      return { answer: CLIENT_EMERGENCY_REDIRECT_MESSAGE, isEmergency: true, isOffline: true };
     }
-    if (checkOffTopic(question)) {
-      return { answer: OFF_TOPIC_REDIRECT_MESSAGE, isOffTopic: true };
+    if (checkClientOffTopic(question)) {
+      return { answer: CLIENT_OFF_TOPIC_REDIRECT_MESSAGE, isOffTopic: true, isOffline: true };
     }
 
     if (isStaticHost()) {
-      return { answer: generateLiteAnswer(question, airData?.aqi) };
+      return { answer: generateLiteAnswer(question, airData?.aqi, airData?.pm25), isOffline: true };
     }
 
     try {
@@ -280,13 +283,14 @@ export const apiService = {
         body: JSON.stringify({ question, context: { airData }, lang: _lang }),
       });
       if (res.ok) {
-        return (await res.json()) as { answer: string; isEmergency?: boolean; isOffTopic?: boolean };
+        const json = (await res.json()) as { answer: string; isEmergency?: boolean; isOffTopic?: boolean };
+        return { ...json, isOffline: false };
       }
     } catch {
       // Gateway unreachable
     }
 
-    return { answer: generateLiteAnswer(question, airData?.aqi) };
+    return { answer: generateLiteAnswer(question, airData?.aqi, airData?.pm25), isOffline: true };
   },
 
   async getUsage(): Promise<{ status: string; uptimeSeconds: number; cache: { itemsCached: number; maxCapacity: number } }> {

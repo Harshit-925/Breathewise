@@ -50,7 +50,7 @@ export function useChat(airData: AirData | null) {
               const next = [...prev];
               const last = next[next.length - 1];
               if (last && last.role === 'assistant') {
-                next[next.length - 1] = { ...last, content: assistantContent };
+                next[next.length - 1] = { ...last, content: assistantContent, isOffline: true };
               }
               return next;
             });
@@ -77,7 +77,7 @@ export function useChat(airData: AirData | null) {
             const next = [...prev];
             const last = next[next.length - 1];
             if (last && last.role === 'assistant') {
-              next[next.length - 1] = { ...last, content: reply };
+              next[next.length - 1] = { ...last, content: reply, isOffline: true };
             }
             return next;
           });
@@ -122,7 +122,15 @@ export function useChat(airData: AirData | null) {
         }
       } catch (err) {
         if ((err as Error).name !== 'AbortError') {
-          setError((err as Error).message);
+          const reply = generateClientChatReply(userText, airData);
+          setMessages((prev) => {
+            const next = [...prev];
+            const last = next[next.length - 1];
+            if (last && last.role === 'assistant') {
+              next[next.length - 1] = { ...last, content: reply, isOffline: true };
+            }
+            return next;
+          });
         }
       } finally {
         setIsStreaming(false);

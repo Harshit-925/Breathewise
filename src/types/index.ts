@@ -134,6 +134,47 @@ export interface StagnationResult {
 }
 
 // ─── Advice / Chat ───────────────────────────────────────────
+export interface StructuredAdviceVerdict {
+  readonly level: 'good' | 'moderate' | 'unhealthy' | 'hazardous';
+  readonly headline: string;
+  readonly why: string;
+}
+
+export interface StructuredAdviceRoutine {
+  readonly window: string;
+  readonly activity: string;
+  readonly reason: string;
+  readonly impact: string;
+}
+
+export interface StructuredAdviceIndoor {
+  readonly tier: 'diy' | 'standard' | 'premium';
+  readonly title: string;
+  readonly steps: string[];
+  readonly costBand: string;
+  readonly effect: string;
+  readonly assumptions: string[];
+}
+
+export interface StructuredAdviceAlternative {
+  readonly from: string;
+  readonly to: string;
+  readonly effort: string;
+  readonly exposureDelta: number;
+  readonly co2eDelta: number;
+  readonly assumptions: string[];
+}
+
+export interface StructuredAdvice {
+  readonly verdict: StructuredAdviceVerdict;
+  readonly routine: readonly StructuredAdviceRoutine[];
+  readonly indoor: readonly StructuredAdviceIndoor[];
+  readonly alternatives: readonly StructuredAdviceAlternative[];
+  readonly disclaimer: string;
+  readonly isOffline?: boolean;
+  readonly source?: 'gemini' | 'offline_heuristic';
+}
+
 export interface AdviceResponse {
   readonly summary: string;
   readonly bullets: readonly string[];
@@ -145,6 +186,7 @@ export interface ChatMessage {
   readonly role: 'user' | 'assistant';
   readonly content: string;
   readonly timestamp: string;
+  readonly isOffline?: boolean;
 }
 
 // ─── Engine result wrappers ──────────────────────────────────

@@ -83,7 +83,12 @@ export const ChatView: React.FC = () => {
       {/* Quick Ask Result Card if active */}
       {quickAsk && quickAnswer && (
         <div role="region" aria-label="Quick Answer" className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl text-xs leading-relaxed text-amber-950 dark:text-amber-100">
-          <strong className="block mb-1 font-bold text-amber-800 dark:text-amber-300">Quick Answer:</strong>
+          <div className="flex items-center justify-between mb-1.5">
+            <strong className="font-bold text-amber-800 dark:text-amber-300">Quick Answer:</strong>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-700">
+              ⚡ AI unavailable, offline guidance
+            </span>
+          </div>
           {quickAnswer}
         </div>
       )}
@@ -111,6 +116,13 @@ export const ChatView: React.FC = () => {
                 {msg.content || (isStreaming && idx === messages.length - 1 ? (
                   <span className="italic text-slate-400">Thinking...</span>
                 ) : null)}
+
+                {msg.role === 'assistant' && msg.isOffline && (
+                  <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700/60 flex items-center gap-1.5 text-[10px] text-amber-700 dark:text-amber-300 font-bold">
+                    <span>⚡</span>
+                    <span>AI unavailable, offline rule-based response</span>
+                  </div>
+                )}
               </div>
             </div>
           ))}

@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useApp } from '../context/AppContext.js';
 import { apiService } from '../services/apiService.js';
-import type { AirData } from '../types/index.js';
-import type { StructuredAdvice } from '../../server/ai/fallback.js';
+import type { AirData, StructuredAdvice } from '../types/index.js';
 
 export function useAdvice(airData: AirData | null) {
   const { household, lang } = useApp();
