@@ -107,6 +107,7 @@ export const AlternativesView: React.FC = () => {
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 font-semibold">
                 <th className="py-2.5 px-3">Mode</th>
+                <th className="py-2.5 px-3">Est. Time</th>
                 <th className="py-2.5 px-3">Inhaled PM2.5 (µg)</th>
                 <th className="py-2.5 px-3">CO2e Emissions (kg)</th>
                 <th className="py-2.5 px-3">Recommendation</th>
@@ -116,11 +117,15 @@ export const AlternativesView: React.FC = () => {
               {comparison.results.map((r) => {
                 const meta = MODE_LABELS[r.mode];
                 const isBest = r.mode === 'metro';
+                const timeMin = r.durationMinutes ?? durationMins;
                 return (
                   <tr key={r.mode} className={`hover:bg-slate-50 dark:hover:bg-slate-800/40 ${isBest ? 'bg-blue-50/40 dark:bg-blue-950/20' : ''}`}>
                     <td className="py-3 px-3 font-semibold flex items-center gap-2">
                       <span aria-hidden="true" className="text-base">{meta.icon}</span>
                       <span>{meta.label}</span>
+                    </td>
+                    <td className="py-3 px-3 font-mono text-slate-600 dark:text-slate-300">
+                      ~{timeMin} min
                     </td>
                     <td className="py-3 px-3 font-mono font-medium">
                       {Math.round(r.inhaledPm25Ug)} µg

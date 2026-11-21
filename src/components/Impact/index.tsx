@@ -5,7 +5,8 @@ import { actionImpact } from '../../lib/engine/impact.js';
 
 export const ImpactView: React.FC = () => {
   const { airData } = useAirData();
-  const pm25 = airData?.pm25 ?? 120;
+  const isFallbackPm25 = !airData || !Number.isFinite(airData.pm25);
+  const pm25 = isFallbackPm25 ? 120 : airData.pm25;
 
   // Interactive toggle actions
   const [useMask, setUseMask] = useState<boolean>(true);
@@ -13,15 +14,18 @@ export const ImpactView: React.FC = () => {
   const [workFromHome, setWorkFromHome] = useState<boolean>(false);
   const [switchTransit, setSwitchTransit] = useState<boolean>(true);
 
+  // US EPA Exposure Factors Handbook: Adult light activity inhalation = 16 L/min (0.96 m³/h)
+  const breathingRateLpm = 16;
+
   // Baseline scenario: 3 hours outdoors, no mask, leaky indoor, car commute
-  const baselineDose = inhaledDose(pm25, 3, 0.9, 0.7, 0).doseUg;
+  const baselineDose = inhaledDose(pm25, 3, breathingRateLpm, 0.7, 0).doseUg;
   const baselineCarCo2e = 2.4; // 12 km commute
 
   // Active scenario
   const outdoorHours = workFromHome ? 0.5 : 2.0;
   const maskEfficiency = useMask ? 0.95 : 0;
   const indoorIoRatio = usePurifier ? 0.2 : 0.6;
-  const activeDose = inhaledDose(pm25, outdoorHours, 0.9, indoorIoRatio, maskEfficiency).doseUg;
+  const activeDose = inhaledDose(pm25, outdoorHours, breathingRateLpm, indoorIoRatio, maskEfficiency).doseUg;
 
   const wfhImpact = workFromHome ? actionImpact('wfh', { dailyDriveKm: 15, currentMode: 'car' }) : null;
   const transitImpact = switchTransit ? actionImpact('public_transit', { dailyDriveKm: 12, currentMode: 'car' }) : null;
@@ -34,9 +38,16 @@ export const ImpactView: React.FC = () => {
   return (
     <section aria-labelledby="impact-meter-heading" className="space-y-6">
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-        <h2 id="impact-meter-heading" className="text-lg font-bold">
-          Personal Exposure & Emission Impact Meter
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 id="impact-meter-heading" className="text-lg font-bold">
+            Personal Exposure & Emission Impact Meter
+          </h2>
+          {isFallbackPm25 && (
+            <span className="text-xs bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-semibold px-2.5 py-0.5 rounded-full border border-amber-300">
+              ⚠️ Baseline simulation: 120 µg/m³ PM2.5 (awaiting air data)
+            </span>
+          )}
+        </div>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
           Toggle personal interventions below to see direct mathematical reduction in PM2.5 inhaled dose and avoided greenhouse emissions.
         </p>

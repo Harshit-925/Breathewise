@@ -86,6 +86,8 @@ export interface ModeResult {
   readonly mode: TransportMode;
   readonly inhaledPm25Ug: number;
   readonly co2eKg: number;
+  readonly durationMinutes?: number;
+  readonly speedKmh?: number;
   readonly assumptions: readonly string[];
 }
 

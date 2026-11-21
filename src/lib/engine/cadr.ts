@@ -24,26 +24,31 @@ export function cadrRequired(
 
 /**
  * Estimate minutes to reach target PM2.5 reduction.
- * Uses exponential decay: t = −V / (CADR × η) × ln(1 − target_fraction)
- * Simplified: time to reduce by one e-fold ≈ V / (CADR × η − naturalLoss).
- * Returns minutes for a 63% reduction (one time-constant).
+ * Uses exponential decay: t = −V / (CADR × η − naturalLoss) × ln(1 − target_fraction) × 60.
+ * Default targetFraction = 0.632 (one e-fold / 63% reduction).
+ * Pass targetFraction = 0.90 for 90% clearance.
  */
 export function purificationTime(
   volume: number,
   cadr: number,
   efficiency: number = 0.95,
   naturalLoss: number = 0,
+  targetFraction: number = 0.632,
 ): PurificationTimeResult {
+  const isOneEFold = Math.abs(targetFraction - 0.632) < 0.01;
   const assumptions: string[] = [
     'Assumes well-mixed room (single-zone model)',
-    'Returns time for one e-fold (63 %) PM2.5 reduction',
+    isOneEFold
+      ? 'Returns time for one e-fold (63 % PM2.5 reduction)'
+      : `Returns time for ${(targetFraction * 100).toFixed(0)} % PM2.5 reduction`,
   ];
   const effectiveRate = cadr * efficiency - naturalLoss;
   if (effectiveRate <= 0 || volume <= 0) {
     assumptions.push('Effective rate ≤ 0; purification not achievable');
     return { minutes: Infinity, assumptions };
   }
-  const hours = volume / effectiveRate;
+  const decayFactor = isOneEFold ? 1 : -Math.log(1 - Math.min(0.999, Math.max(0.01, targetFraction)));
+  const hours = (volume / effectiveRate) * decayFactor;
   return { minutes: hours * 60, assumptions };
 }
 
