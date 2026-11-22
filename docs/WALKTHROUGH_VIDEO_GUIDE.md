@@ -5,10 +5,10 @@ This guide provides the complete walkthrough structure, live testing data, GenAI
 ---
 
 ## Video File Details
-- **Generated Video Path**: [`docs/video/breathewise_walkthrough.webm`](./video/breathewise_walkthrough.webm)
-- **Resolution**: 1280 × 720 (720p HD, 16:9)
-- **File Size**: ~8.5 MB
-- **Formats Accepted by YouTube & Google Drive**: Native WebM format is directly supported by YouTube and Google Drive without re-encoding.
+- **Primary MP4 Video**: [`docs/video/breathewise_walkthrough.mp4`](./video/breathewise_walkthrough.mp4) (H.264 / AAC compatible, **2.72 MB**)
+- **Source WebM Video**: [`docs/video/breathewise_walkthrough.webm`](./video/breathewise_walkthrough.webm) (VP9, 8.5 MB)
+- **Resolution**: 1280 × 720 (720p HD, 16:9 widescreen)
+- **Encoding**: Fast-start MP4 with universal `yuv420p` pixel format (plays in Windows Media Player, QuickTime, iOS, Android, Chrome, Edge, and uploads seamlessly to YouTube & Google Drive).
 
 ---
 
